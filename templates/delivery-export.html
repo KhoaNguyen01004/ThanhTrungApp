@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>End of Day</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/delivery-export.css">
+</head>
+<body>
+    <header class="top-header">
+        <div class="header-left">
+            <a href="/" class="btn-nav">Back to Map</a>
+            <h1>End of Day</h1>
+        </div>
+        <nav class="header-nav">
+            <a href="/" class="btn-nav">Map</a>
+            <a href="/delivery/dashboard" class="btn-nav">Dispatch</a>
+            <a href="/delivery/new" class="btn-nav">Plan Builder</a>
+            <a href="/delivery/export" class="btn-nav active">End of Day</a>
+            <a href="/locations" class="btn-nav">Locations</a>
+        </nav>
+    </header>
+
+    <main class="export-page">
+        <!-- 1. Which day ------------------------------------------------ -->
+        <section class="export-card">
+            <h2>1. Which day</h2>
+            <div class="export-row">
+                <label for="exportDate">Delivery date</label>
+                <input type="date" id="exportDate">
+                <span class="export-hint" id="dateSummary"></span>
+            </div>
+        </section>
+
+        <!-- 2. Proof already collected ---------------------------------- -->
+        <section class="export-card">
+            <h2>2. Photos from the stops</h2>
+            <p class="export-hint">
+                Taken during the day. A stop missing a photo can still be chased
+                while the driver is reachable — which is the reason this is shown
+                before the download rather than after.
+            </p>
+            <div id="proofSummary" class="export-proof"></div>
+        </section>
+
+        <!-- 3. Loading photos ------------------------------------------- -->
+        <section class="export-card">
+            <h2>3. Loading photos <span class="export-sub">(HinhNhanHang &mdash; taken the day before, one folder per driver)</span></h2>
+            <div class="export-row">
+                <label for="loadingDate">Date on the folder</label>
+                <input type="date" id="loadingDate">
+                <label for="loadingDriver">Driver</label>
+                <select id="loadingDriver"></select>
+                <label class="btn-nav export-upload-btn">
+                    Add files
+                    <input type="file" id="loadingInput" accept="image/*,video/*" multiple style="display:none;">
+                </label>
+                <span class="export-hint" id="loadingStatus"></span>
+            </div>
+            <div id="loadingList" class="export-thumbs export-thumbs--scroll"></div>
+        </section>
+
+        <!-- 4. Empty containers ----------------------------------------- -->
+        <section class="export-card">
+            <h2>4. Empty containers <span class="export-sub">(HinhThungTrong &mdash; one per driver)</span></h2>
+            <div class="export-row">
+                <label for="containerDriver">Driver</label>
+                <select id="containerDriver"></select>
+                <label class="btn-nav export-upload-btn">
+                    Add file
+                    <input type="file" id="containerInput" accept="image/*,video/*" style="display:none;">
+                </label>
+                <span class="export-hint" id="containerStatus"></span>
+            </div>
+            <div id="containerList" class="export-thumbs"></div>
+        </section>
+
+        <!-- 5. Download -------------------------------------------------- -->
+        <section class="export-card">
+            <h2>5. Download</h2>
+            <div class="export-row">
+                <label for="folderName">Folder name</label>
+                <input type="text" id="folderName" class="export-folder-input"
+                       placeholder="2_8_BacLieuGiaRai_CanThoOMon">
+            </div>
+            <p class="export-hint">
+                The route names live nowhere in the data, so this is typed. It
+                becomes the name of the folder inside the ZIP.
+            </p>
+            <div class="export-row">
+                <button type="button" class="btn-primary" id="downloadBtn">Download ZIP</button>
+                <span class="export-hint" id="downloadStatus"></span>
+            </div>
+            <pre class="export-tree" id="structurePreview"></pre>
+        </section>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/delivery-export.js"></script>
+</body>
+</html>

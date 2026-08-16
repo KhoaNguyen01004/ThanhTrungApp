@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatch Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.css" />
+    <link rel="stylesheet" href="/static/css/delivery-dashboard.css">
+</head>
+<body>
+    <div class="dashboard-shell">
+        <!-- Header -->
+        <header class="top-header dashboard-header">
+            <div class="header-left">
+                <a href="/" class="btn-nav">Back to Map</a>
+                <h1>Dispatch Dashboard</h1>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="btn-nav">Map</a>
+                <a href="/delivery/dashboard" class="btn-nav active">Dispatch</a>
+                <a href="/delivery/new" class="btn-nav">Plan Builder</a>
+                <a href="/delivery/export" class="btn-nav">End of Day</a>
+                <a href="/locations" class="btn-nav">Locations</a>
+                <a href="/truck-load-planner" class="btn-nav">Load Planner</a>
+                <div class="nav-dropdown" style="position:relative;">
+                    <button class="btn-nav" onclick="var d=this.nextElementSibling;d.style.display=d.style.display==='block'?'none':'block'" style="cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;color:#c9d1d9;font-weight:500;padding:0 14px;height:34px;display:inline-flex;align-items:center;gap:4px;">Fleet &#9662;</button>
+                    <div style="display:none;position:absolute;top:100%;right:0;background:#161b22;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px;min-width:170px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:200;" class="fleet-dropdown">
+                        <a href="/oil-change" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Oil Change</a>
+                        <a href="/vehicle-management" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Vehicles</a>
+                        <a href="/fuel-efficiency" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Fuel</a>
+                        <a href="/fuel-container" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Container</a>
+                    </div>
+                </div>
+            </nav>
+            <div class="header-filters">
+                <!-- Dispatcher intents, not fields. The five field filters below
+                     still exist and still work — they just no longer occupy the
+                     first reach for the cases that come up every few minutes. -->
+                <div class="quick-filters" id="quickFilters">
+                    <button type="button" class="quick-chip active" data-quick="">All</button>
+                    <button type="button" class="quick-chip" data-quick="attention">Needs attention</button>
+                    <button type="button" class="quick-chip" data-quick="executing">Executing</button>
+                    <button type="button" class="quick-chip" data-quick="nogps">No GPS</button>
+                </div>
+                <div class="filters-wrap">
+                    <button type="button" class="btn-nav" id="filtersToggleBtn" title="Plan, date, vehicle, driver, status filters">Filters<span class="filters-badge" id="filtersActiveCount" style="display:none;"></span></button>
+                    <div class="dashboard-filters" id="dashboardFilters">
+                        <div class="filter-group">
+                            <label for="filterPlan">Plan</label>
+                            <select id="filterPlan"><option value="">All Plans</option></select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterDate">Date</label>
+                            <input type="date" id="filterDate">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterVehicle">Vehicle</label>
+                            <input type="text" id="filterVehicle" placeholder="Search plate...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterDriver">Driver</label>
+                            <input type="text" id="filterDriver" placeholder="Search driver...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterStatus">Status</label>
+                            <select id="filterStatus">
+                                <option value="">All</option>
+                                <option value="confirmed">Confirmed</option>
+                                <option value="executing">Executing</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <span id="pollStatus" class="poll-status"></span>
+                <button class="btn-nav" id="refreshNowBtn" title="Refresh now">&#x21bb;</button>
+                <button class="btn-nav timeline-toggle" id="timelineToggleBtn" title="Toggle timeline">&#x2630;</button>
+                <div class="manage-plans-wrap">
+                    <button class="btn-nav" id="managePlansBtn" title="Manage Plans">&#x2699; Plans</button>
+                    <div class="manage-plans-dropdown" id="managePlansDropdown">
+                        <div class="manage-plans-header">
+                            <strong>Manage Plans</strong>
+                            <button class="manage-plans-close" id="managePlansClose">&#x2715;</button>
+                        </div>
+                        <div class="manage-plans-list" id="managePlansList">
+                            <div class="empty-state" style="padding:16px;">Loading plans...</div>
+                        </div>
+                        <div class="manage-plans-actions">
+                            <button class="btn-nav" id="deleteSelectedPlansBtn" disabled>Delete Selected</button>
+                            <button class="btn-nav btn-danger" id="clearAllPlansBtn">Clear All</button>
+                        </div>
+                    </div>
+                </div>
+                <a href="/delivery/new" class="btn-nav">+ New Plan</a>
+            </div>
+        </header>
+
+        <!-- Left Panel: Vehicle List -->
+        <aside class="dashboard-left" id="leftPanel">
+            <div class="panel-header">
+                <h2>Vehicles</h2>
+                <label class="attention-sort-toggle" for="attentionFirstToggle" title="Sort by worst problem first">
+                    <input type="checkbox" id="attentionFirstToggle"> Attention
+                </label>
+                <label class="attention-sort-toggle" for="compactModeToggle" title="One line per vehicle — fits the whole fleet on screen">
+                    <input type="checkbox" id="compactModeToggle"> Compact
+                </label>
+                <span id="vehicleCount" class="panel-count"></span>
+                <span class="kbd-hint" title="j / k — move down / up the list&#10;Enter — open the focused vehicle&#10;Esc — close, or clear the selection&#10;/ — search by plate&#10;a — advance the current stop&#10;f — toggle Follow&#10;r — refresh now">⌨</span>
+            </div>
+            <div class="attention-strip" id="attentionStrip" style="display:none;"></div>
+            <div class="vehicle-list" id="vehicleList">
+                <div class="empty-state">Loading vehicles...</div>
+            </div>
+        </aside>
+
+        <!-- Center Panel: Map -->
+        <main class="dashboard-center" id="centerPanel">
+            <div id="dashboardMap" class="dashboard-map"></div>
+
+            <!-- Map controls overlay -->
+            <div class="map-controls">
+                <button class="btn-nav map-control-btn" id="zoomToVehicleBtn" title="Zoom to vehicle" style="display:none;">&#8982; Zoom Vehicle</button>
+                <button class="btn-nav map-control-btn" id="followVehicleBtn" title="Follow vehicle as it moves" style="display:none;">&#8982; Follow</button>
+                <button class="btn-nav map-control-btn" id="openGmapsBtn" title="Open in Google Maps" style="display:none;">&#x2197; Google Maps</button>
+                <button class="btn-nav map-control-btn" id="refreshGPSBtn" title="Refresh GPS">&#x21bb; GPS</button>
+                <button class="btn-nav map-control-btn" id="measureBtn" title="Measure distance — right-click the map to start, Esc to finish">&#x2921; Measure</button>
+            </div>
+
+            <!-- Measure readout. Top-centre because all four corners are taken:
+                 zoom + layer control at top-left, .map-controls at top-right,
+                 the vehicle info bar along the bottom. -->
+            <div class="measure-readout" id="measureReadout" style="display:none;"></div>
+
+            <!-- Street view panel. Bottom-left is the only free corner: zoom
+                 and the layer control own top-left, .map-controls owns
+                 top-right, the measure readout owns top-centre and the vehicle
+                 info bar runs along the bottom edge. -->
+            <div class="streetview-panel" id="streetViewPanel" style="display:none;">
+                <div class="sv-header">
+                    <span class="sv-title" data-sv-title></span>
+                    <button class="sv-expand" data-sv-expand title="Enlarge / shrink">&#9974;</button>
+                    <button class="sv-close" data-sv-close title="Close street view (Esc)">&times;</button>
+                </div>
+                <div class="sv-body">
+                    <!-- MapillaryJS mounts into this and keeps its WebGL context
+                         for the life of the page, so it must not be rebuilt by
+                         innerHTML. Messages go in the overlay above it instead. -->
+                    <div class="sv-viewer" data-sv-viewer></div>
+                    <div class="sv-overlay" data-sv-overlay></div>
+                </div>
+                <div class="sv-meta" data-sv-meta></div>
+            </div>
+
+            <!-- Vehicle info bar -->
+            <div class="vehicle-info-bar" id="vehicleInfoBar" style="display:none;">
+                <div class="vibar-left">
+                    <strong id="vibarVehicle"></strong>
+                    <span id="vibarDriver"></span>
+                    <span class="status-badge" id="vibarStatus"></span>
+                </div>
+                <div class="vibar-right">
+                    <span id="vibarProgress"></span>
+                    <span id="vibarDistance"></span>
+                    <span id="vibarEta"></span>
+                    <span id="vibarSpeed"></span>
+                    <span id="vibarGpsTime"></span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel: Timeline -->
+        <aside class="dashboard-right" id="rightPanel">
+            <div class="panel-header">
+                <h2>Timeline</h2>
+                <span id="stopCount" class="panel-count"></span>
+                <button class="btn-nav timeline-close" id="timelineCloseBtn" title="Close timeline" style="display:none;">&#x2715;</button>
+            </div>
+            <div class="restriction-banner" id="restrictionBanner" style="display:none;"></div>
+            <div class="current-stop-card" id="currentStopCard" style="display:none;"></div>
+            <div class="timeline" id="timeline">
+                <div class="empty-state">Select a vehicle to view stops</div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Street view. Both are optional at runtime: streetview.js falls back to
+         the Mapillary embed iframe if MapillaryJS did not load, and map.js
+         simply omits the coverage overlay if VectorGrid did not. A CDN outage
+         degrades street view rather than taking the dispatch board down. -->
+    <script src="https://unpkg.com/mapillary-js@4.1.2/dist/mapillary.js"></script>
+    <script src="https://unpkg.com/leaflet.vectorgrid@1.3.0/dist/Leaflet.VectorGrid.bundled.js"></script>
+    <script>
+      // Client token for MapillaryJS and the coverage tiles, which authenticate
+      // their own requests and so cannot use the server-side proxy. Read-only
+      // access to public imagery — see app/routes/core.py:delivery_dashboard
+      // for why this one credential is exposed and what a leak actually costs.
+      window.DASH_CONFIG = { mapillaryToken: {{ mapillary_token | tojson }} };
+    </script>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/dashboard/api.js"></script>
+    <script src="/static/js/dashboard/polling.js"></script>
+    <script src="/static/js/dashboard/vehicle-list.js"></script>
+    <script src="/static/js/dashboard/map.js"></script>
+    <script src="/static/js/dashboard/measure.js"></script>
+    <script src="/static/js/dashboard/streetview.js"></script>
+    <script src="/static/js/dashboard/timeline.js"></script>
+    <script src="/static/js/dashboard/main.js"></script>
+    <script>document.addEventListener('click',e=>{if(!e.target.closest('.nav-dropdown'))document.querySelectorAll('.fleet-dropdown').forEach(d=>d.style.display='none')});</script>
+</body>
+</html>

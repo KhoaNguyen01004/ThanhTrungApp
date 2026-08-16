@@ -1,0 +1,2066 @@
+/* ============================================================
+   DISPATCH DASHBOARD — 3-panel layout
+   ============================================================ */
+
+.dashboard-shell {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 280px 1fr 300px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.dashboard-shell > .top-header {
+    grid-column: 1 / -1;
+}
+
+/* ── Dashboard Header ─────────────────────────────────────── */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px;
+    flex-wrap: wrap;
+    min-height: var(--header-h);
+}
+
+.dashboard-header .header-nav {
+    flex-shrink: 0;
+}
+
+.dashboard-header .header-left {
+    flex-shrink: 0;
+}
+
+/* Quick filters sit where the five field filters used to, and the fields move
+   into a disclosure anchored to .filters-wrap. This is also what stops the
+   header's widest flexing element from being five inputs that reflow. */
+.header-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.quick-filters {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.quick-chip {
+    height: 26px;
+    padding: 0 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.quick-chip:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-primary);
+}
+
+.quick-chip.active {
+    background: rgba(56,139,253,0.16);
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.filters-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.filters-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 15px;
+    height: 15px;
+    margin-left: 5px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+}
+
+.dashboard-filters {
+    /* Closed by default. Fixed width with wrapping fields rather than one long
+       row, so the panel's footprint is predictable at any header width and
+       can't hang off the viewport the way an auto-width row would. */
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 200;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    padding: 10px;
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.dashboard-filters.open {
+    display: flex;
+}
+
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.filter-group label {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+.filter-group input,
+.filter-group select {
+    height: 26px;
+    padding: 0 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-family: inherit;
+    min-width: 80px;
+    max-width: 130px;
+    transition: border-color var(--transition);
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.timeline-toggle {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .timeline-toggle {
+        display: inline-flex;
+    }
+    .timeline-close {
+        display: inline-flex !important;
+        margin-left: auto;
+        font-size: 14px;
+    }
+    /* Mobile-only — unconditional overflow-x here previously clipped the
+       nav dropdowns invisible at every width (setting overflow-x forces
+       the browser to also compute overflow-y as auto). */
+    .dashboard-header .header-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .dashboard-header .header-nav::-webkit-scrollbar {
+        display: none;
+    }
+    /* The wrap can sit anywhere along a wrapped header at this width, and a
+       320px panel anchored left would hang off the right edge. Same corner
+       problem the Manage Plans panel clamps for. */
+    .dashboard-filters {
+        left: auto;
+        right: 0;
+    }
+    /* Scroll the chips rather than wrapping them into a second header row. */
+    .quick-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+    .quick-filters::-webkit-scrollbar {
+        display: none;
+    }
+    /* A title-attribute tooltip is unreachable on touch, and there is no
+       keyboard to hint at. */
+    .kbd-hint {
+        display: none;
+    }
+}
+
+.poll-status {
+    font-size: 10px;
+    color: var(--text-secondary);
+    padding: 3px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.poll-status.poll-ok {
+    background: rgba(52,211,153,0.1);
+    color: #34d399;
+}
+
+.poll-status.poll-error {
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+}
+
+.poll-status.poll-paused {
+    background: rgba(251,191,36,0.1);
+    color: #fbbf24;
+}
+
+/* The poll succeeded but the data it carried is not fully trustworthy: some
+   plates have no live position. Distinct from poll-error, which means the
+   request itself failed. */
+.poll-status.poll-degraded {
+    background: rgba(251,146,60,0.14);
+    color: #fb923c;
+}
+
+/* No usable positions at all, or none that matched a plate. Deliberately as
+   loud as an outright request failure — a map full of unmatched positions is
+   worse than an empty one, because it looks correct. */
+.poll-status.poll-gpsdown {
+    background: rgba(239,68,68,0.16);
+    color: #f87171;
+    font-weight: 700;
+}
+
+/* ── Left Panel ───────────────────────────────────────────── */
+.dashboard-left {
+    grid-row: 2;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.dashboard-left .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.panel-header h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+.panel-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.06);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* ── Attention (stuck / stale-GPS proxies) ────────────────── */
+/* Two toggles, a count and a shortcut hint now share a 280px header, so the
+   spacing comes from the container's gap rather than per-item margins. */
+.dashboard-left .panel-header {
+    gap: 5px;
+    padding: 10px 12px;
+}
+
+.dashboard-left .panel-header h2 {
+    flex-shrink: 0;
+}
+
+.attention-sort-toggle {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.attention-sort-toggle input {
+    cursor: pointer;
+    margin: 0;
+}
+
+.attention-strip {
+    display: flex;
+    gap: 6px;
+    padding: 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.attention-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 5px 10px;
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background var(--transition);
+}
+
+.attention-chip:hover {
+    background: rgba(239,68,68,0.18);
+}
+
+.attention-chip-plate {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.attention-chip-reason {
+    font-size: 9.5px;
+    color: #f87171;
+}
+
+/* ── Severity tiers ───────────────────────────────────────────
+   Warn is amber, critical is red *and* heavier — hue alone would leave the
+   two tiers indistinguishable to a red-weak dispatcher, and this panel is
+   read at a glance for eight hours at a stretch. Same reasoning as the map
+   markers carrying both a dark ring and a light one. */
+.attention-chip.sev-warn {
+    background: rgba(251,146,60,0.1);
+    border-color: rgba(251,146,60,0.3);
+}
+
+.attention-chip.sev-warn:hover {
+    background: rgba(251,146,60,0.18);
+}
+
+.attention-chip.sev-warn .attention-chip-reason {
+    color: #fb923c;
+}
+
+.attention-chip.sev-critical {
+    background: rgba(239,68,68,0.14);
+    border-color: rgba(239,68,68,0.55);
+}
+
+.attention-chip.sev-critical .attention-chip-plate {
+    text-decoration: underline;
+    text-decoration-color: rgba(248,113,113,0.6);
+    text-underline-offset: 2px;
+}
+
+/* Overflow indicator — the strip caps at 8 chips and this turns on the
+   Attention-first sort rather than growing the strip further. */
+.attention-chip-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.06);
+    border-color: var(--border);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.attention-chip-more:hover {
+    background: rgba(255,255,255,0.12);
+}
+
+.vc-vehicle-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.vc-attention-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f87171;
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.2);
+    flex-shrink: 0;
+}
+
+.vc-attention-dot.sev-warn {
+    background: #fb923c;
+    box-shadow: 0 0 0 2px rgba(251,146,60,0.2);
+}
+
+/* Critical is larger as well as redder — relative size is the third channel,
+   after hue and weight, that CAD displays use to make priority readable
+   without being read. */
+.vc-attention-dot.sev-critical {
+    width: 9px;
+    height: 9px;
+    background: #f87171;
+    box-shadow: 0 0 0 2px rgba(239,68,68,0.35);
+}
+
+/* A left border rather than a background tint: the card already uses
+   background for hover and selection, and stacking a third meaning on it
+   made a selected card with a problem unreadable. */
+.vehicle-card.attention-warn {
+    border-left: 3px solid #fb923c;
+    padding-left: 10px;
+}
+
+.vehicle-card.attention-critical {
+    border-left: 3px solid #f87171;
+    padding-left: 10px;
+}
+
+/* Keyboard focus ring (j/k). Distinct from .selected, which is a filled
+   accent — this is an outline, so a card can legibly be both at once. */
+.vehicle-card.focused {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+}
+
+.vc-gps-time.vc-gps-missing {
+    color: #fb923c;
+    font-weight: 600;
+}
+
+.kbd-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: help;
+    opacity: 0.7;
+    user-select: none;
+}
+
+.kbd-hint:hover {
+    opacity: 1;
+}
+
+.vehicle-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* ── Vehicle Cards ────────────────────────────────────────── */
+.vehicle-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition);
+    user-select: none;
+}
+
+.vehicle-card:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: var(--border-hover);
+}
+
+.vehicle-card.selected {
+    background: rgba(56,139,253,0.08);
+    border-color: var(--accent);
+}
+
+.vc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.vc-vehicle {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.vc-driver {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    margin-top: 1px;
+}
+
+.vc-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.vc-current-stop {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vc-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--text-secondary);
+}
+
+.vc-progress {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.vc-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+/* ── Compact density ──────────────────────────────────────────
+   36 box trucks plus 4 containers do not fit a 280px column at five lines
+   each — about eight are visible at once, which defeats the point of a fleet
+   board. Compact collapses each card to a single row using display:contents,
+   so the card markup and the diffing patch in vehicle-list.js are untouched
+   by it: this is a stylesheet change and nothing else. */
+.vehicle-list.compact {
+    gap: 2px;
+    padding: 4px 6px;
+}
+
+.vehicle-list.compact .vehicle-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    line-height: 1.3;
+}
+
+.vehicle-list.compact .vehicle-card.attention-warn,
+.vehicle-list.compact .vehicle-card.attention-critical {
+    padding-left: 6px;
+}
+
+/* Dissolve the two wrappers so their children become items of the card row. */
+.vehicle-list.compact .vc-header,
+.vehicle-list.compact .vc-header > div,
+.vehicle-list.compact .vc-body,
+.vehicle-list.compact .vc-progress,
+.vehicle-list.compact .vc-meta {
+    display: contents;
+}
+
+.vehicle-list.compact .vc-vehicle-row { order: 1; flex: 0 0 auto; }
+.vehicle-list.compact .vc-vehicle { font-size: 12px; }
+
+.vehicle-list.compact .vc-driver {
+    order: 2;
+    flex: 0 1 auto;
+    margin-top: 0;
+    max-width: 76px;
+    font-size: 10.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.vehicle-list.compact .status-badge { order: 3; flex: 0 0 auto; }
+
+.vehicle-list.compact .vc-current-stop {
+    order: 4;
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 10.5px;
+}
+
+.vehicle-list.compact .vc-progress-bar { display: none; }
+.vehicle-list.compact .vc-progress-text { order: 5; flex: 0 0 auto; font-size: 10.5px; }
+/* Redundant per row — the plan filter is usually what got you here. */
+.vehicle-list.compact .vc-plan-name { display: none; }
+.vehicle-list.compact .vc-gps-time { order: 6; flex: 0 0 auto; font-size: 10px; }
+
+/* On a phone the binding constraint is the tap target, not the row count, so
+   compact is a no-op there and full cards are restored explicitly. */
+@media (max-width: 768px) {
+    .vehicle-list.compact { gap: 6px; padding: 8px; }
+    .vehicle-list.compact .vehicle-card {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px 12px;
+        border-radius: var(--radius);
+    }
+    .vehicle-list.compact .vc-header { display: flex; }
+    .vehicle-list.compact .vc-header > div { display: block; }
+    .vehicle-list.compact .vc-body { display: flex; }
+    .vehicle-list.compact .vc-progress { display: flex; }
+    .vehicle-list.compact .vc-meta { display: flex; }
+    .vehicle-list.compact .vc-progress-bar { display: block; }
+    .vehicle-list.compact .vc-plan-name { display: inline; }
+    .vehicle-list.compact .vc-driver { max-width: none; font-size: 11.5px; margin-top: 1px; }
+    .vehicle-list.compact .vc-current-stop { font-size: 11.5px; }
+}
+
+.vc-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+.vc-progress-fill.status-completed { background: var(--success); }
+.vc-progress-fill.status-arrived { background: #fb923c; }
+.vc-progress-fill.status-confirmed { background: var(--accent); }
+.vc-progress-fill.status-draft { background: #9ca3af; }
+
+.vc-progress-text {
+    font-size: 10.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.status-badge.status-draft {
+    background: rgba(156,163,175,0.15);
+    color: #9ca3af;
+}
+
+.status-badge.status-confirmed {
+    background: rgba(56,139,253,0.15);
+    color: var(--accent);
+}
+
+.status-badge.status-executing {
+    background: rgba(34,211,238,0.15);
+    color: #22d3ee;
+}
+
+.status-badge.status-arrived {
+    background: rgba(251,146,60,0.15);
+    color: #fb923c;
+}
+
+.status-badge.status-completed {
+    background: rgba(46,160,67,0.15);
+    color: var(--success);
+}
+
+.status-badge.status-skipped {
+    background: rgba(234,179,8,0.15);
+    color: #eab308;
+}
+
+.status-badge.status-cancelled {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+}
+
+.status-badge.status-planned {
+    background: rgba(156,163,175,0.1);
+    color: #9ca3af;
+}
+
+/* ── Center Panel ─────────────────────────────────────────── */
+.dashboard-center {
+    grid-row: 2;
+    grid-column: 2;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Map controls overlay */
+.map-controls {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 1000;
+}
+
+.map-control-btn {
+    font-size: 11px;
+    height: 30px;
+    padding: 0 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Opaque on hover, deliberately. These buttons float over the map, and the
+   hover state used to be rgba(255,255,255,0.12) — 12% white, i.e. mostly
+   transparent, so on hover the OSM tiles showed straight through and the
+   near-white label sat on whatever pale road or building happened to be
+   underneath. The button became least readable exactly when pointed at. */
+.map-control-btn:hover {
+    background: var(--surface-3);
+    color: var(--text-primary);
+    border-color: var(--accent);
+}
+
+.map-control-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+/* Follow is a toggle — keep the accent identity on hover rather than dropping
+   back to the neutral hover above, which read as "turning off". */
+.map-control-btn.active:hover {
+    background: var(--accent-hover);
+    color: #fff;
+    border-color: var(--accent-hover);
+}
+
+/* ── Distance measure tool ──────────────────────────────────────
+   Right-click arms the ruler; see static/js/dashboard/measure.js. Everything
+   here has to stay legible on BOTH basemaps — imagery is dark, Streets and
+   Muted are near-white — which is why the pins carry a dark ring inside a
+   light one and the path is drawn over a white casing, the same trick the
+   vehicle markers and the violated-leg route polyline use. */
+.leaflet-container.measuring {
+    cursor: crosshair;
+}
+
+/* Leaflet keeps the grab cursor on a draggable marker, which is the correct
+   affordance and should survive the crosshair above. */
+.leaflet-container.measuring .leaflet-marker-draggable {
+    cursor: grab;
+}
+
+.measure-pin {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fb923c;
+    border: 2px solid #1c2128;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
+    box-sizing: border-box;
+}
+
+/* The first pin is hollow, so "where did this path start" is answerable at a
+   glance on a path that doubles back over itself. */
+.measure-pin.start {
+    background: #1c2128;
+    border-color: #fb923c;
+}
+
+.measure-label {
+    background: rgba(28,33,40,0.92);
+    border: 1px solid #fb923c;
+    border-radius: 4px;
+    color: #f0f6fc;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 5px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.45);
+}
+
+/* Leaflet draws a tooltip arrow via ::before; there is no arrow in this
+   design, and left un-hidden it inherits a white border colour. */
+.measure-label::before {
+    display: none;
+}
+
+.measure-readout {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: var(--surface-2);
+    border: 1px solid #fb923c;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    pointer-events: none; /* never intercept a click meant for the map */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Street view panel
+   ------------------------------------------------------------------
+   Docked bottom-left over the map. `bottom` clears the vehicle info bar,
+   which is 40px tall when shown and absent otherwise — 56px sits above it
+   either way rather than jumping when a vehicle is selected. */
+.streetview-panel {
+    position: absolute;
+    bottom: 56px;
+    left: 12px;
+    z-index: 1001; /* above .vehicle-info-bar (1000), below Leaflet popups */
+    width: 380px;
+    max-width: calc(100% - 24px);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.sv-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 8px 7px 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.sv-title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    /* Station names out of the manager's sheet run long and are not worth
+       wrapping the header for. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sv-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.sv-close:hover { color: var(--text-primary); }
+
+.sv-body {
+    /* Fixed height so the panel does not resize between the loading message,
+       a "nothing here" line and a loaded viewer — three different heights in
+       the same corner reads as the UI twitching. */
+    position: relative;
+    height: 260px;
+    background: #000;
+}
+
+/* MapillaryJS mounts here and keeps its WebGL context for the life of the
+   page, so nothing may rebuild this element's contents. */
+.sv-viewer {
+    position: absolute;
+    inset: 0;
+}
+
+/* Messages sit over the viewer rather than replacing it, for the same
+   reason. */
+.sv-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    z-index: 2;
+}
+
+.sv-frame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.sv-message {
+    padding: 0 20px;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.sv-message.sv-error { color: #f85149; }
+
+/* Enlarged panel, for actually walking a route rather than glancing at one
+   frontage. Capped against the viewport so it can never cover the whole map. */
+.streetview-panel.expanded {
+    width: 620px;
+    max-width: calc(100% - 24px);
+}
+
+.streetview-panel.expanded .sv-body { height: 420px; }
+
+.sv-expand {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.sv-expand:hover { color: var(--text-primary); }
+
+/* Where the viewer is standing, drawn on the Leaflet map. The cone shows
+   which way it faces, so walking down a street is legible on the map at the
+   same time as in the photo. */
+.sv-position {
+    width: 30px;
+    height: 30px;
+    position: relative;
+    /* Rotated by the bearing; the cone points "up" at 0deg, matching north. */
+    transform-origin: 50% 50%;
+}
+
+.sv-position-cone {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    margin-left: -11px;
+    width: 0;
+    height: 0;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-bottom: 17px solid rgba(34, 197, 94, 0.45);
+}
+
+.sv-position-dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: #22c55e;
+    /* Dark ring inside, light ring outside — the marker has to read on both
+       the satellite and the near-white street basemaps. */
+    border: 2px solid #0d1117;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
+}
+
+.sv-follow {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.sv-follow input { margin: 0; cursor: pointer; }
+
+/* Imagery a long way from the point that was asked about. Common here and not
+   a fault — most stops are down lanes with no coverage, and the nearest road
+   image is still how a driver approaches. Marked so the distance is noticed. */
+.sv-distance.far {
+    color: #eab308;
+    font-weight: 600;
+}
+
+.sv-meta {
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+    min-height: 15px;
+}
+
+.sv-meta:empty { display: none; }
+
+.sv-meta a { color: #58a6ff; text-decoration: none; }
+.sv-meta a:hover { text-decoration: underline; }
+
+.sv-dot { color: var(--border); }
+
+/* Imagery old enough that the frontage has probably changed. Amber rather
+   than red — it is a caveat on a usable photo, not a failure. */
+.sv-captured.stale {
+    color: #eab308;
+    font-weight: 600;
+}
+
+/* In the field the map panel is narrow, so the docked card becomes a
+   full-width sheet along the bottom instead. */
+@media (max-width: 720px) {
+    .streetview-panel {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        max-width: none;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+    }
+
+    .sv-body { height: 180px; }
+}
+
+/* Vehicle info bar */
+.vehicle-info-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    z-index: 1000;
+    gap: 16px;
+}
+
+.vibar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.vibar-left strong {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.vibar-left > span {
+    color: var(--text-secondary);
+}
+
+.vibar-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+/* ── Right Panel ──────────────────────────────────────────── */
+.dashboard-right {
+    grid-row: 2;
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.dashboard-right .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.timeline {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+/* ── Pinned current-stop card ─────────────────────────────── */
+/* ── Routing restriction banner ───────────────────────────────
+   Three tiers, and they must not look alike: "we checked and it failed" is a
+   different claim from "we checked against a guess", which is different again
+   from "we did not check". */
+.restriction-banner {
+    flex-shrink: 0;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.restriction-banner strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11.5px;
+}
+
+.restriction-banner span {
+    color: var(--text-secondary);
+}
+
+.restriction-banner.violated {
+    background: rgba(248,81,73,0.12);
+    border-left: 3px solid #f85149;
+}
+
+.restriction-banner.violated strong {
+    color: #f85149;
+}
+
+.restriction-banner.estimated {
+    background: rgba(251,146,60,0.09);
+    border-left: 3px solid #fb923c;
+}
+
+.restriction-banner.estimated strong {
+    color: #fb923c;
+}
+
+.restriction-banner.unchecked {
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--text-secondary);
+}
+
+.restriction-banner.unchecked strong {
+    color: var(--text-secondary);
+}
+
+.current-stop-card {
+    /* Clicking the card locates the stop on the map (see timeline.js). */
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 10px 12px;
+    background: rgba(56,139,253,0.06);
+    border-bottom: 1px solid var(--border);
+    font-size: 11.5px;
+}
+
+.cs-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.cs-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+}
+
+.cs-station {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.cs-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.cs-phone {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.cs-phone:hover {
+    text-decoration: underline;
+}
+
+.cs-eta {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Timeline items */
+.timeline-item {
+    /* flex-shrink:0 is load-bearing, not tidiness. .timeline is a flex column,
+       so its children default to flex-shrink:1 — once the expanded stops were
+       taller than the panel the browser squashed every item to fit instead of
+       overflowing, and .timeline's overflow-y:auto never had anything to
+       scroll. Combined with the overflow:hidden below, the bodies were simply
+       clipped out of sight. */
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color var(--transition);
+}
+
+.timeline-item.current {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+}
+
+.timeline-item.completed {
+    opacity: 0.65;
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--transition);
+}
+
+.timeline-header:hover {
+    background: rgba(255,255,255,0.04);
+}
+
+.timeline-seq {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.timeline-item.current .timeline-seq {
+    background: var(--accent);
+    color: #fff;
+}
+
+.timeline-item.completed .timeline-seq {
+    background: rgba(46,160,67,0.15);
+    color: var(--success);
+}
+
+.timeline-item .status-skipped .timeline-seq,
+.timeline-item .status-cancelled .timeline-seq {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+}
+
+.timeline-item .status-planned .timeline-seq {
+    background: rgba(156,163,175,0.1);
+    color: #9ca3af;
+}
+
+.timeline-station {
+    flex: 1;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Reorder controls. Sized for a thumb (26px targets) because this panel is
+   used on a phone in the cab, not only at the dispatch desk. */
+.timeline-move {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.timeline-move-btn {
+    width: 26px;
+    height: 13px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background var(--transition), color var(--transition);
+}
+
+.timeline-move-btn:first-child { border-radius: 5px 5px 0 0; }
+.timeline-move-btn:last-child  { border-radius: 0 0 5px 5px; }
+
+.timeline-move-btn:hover:not(:disabled) {
+    background: var(--accent);
+    color: #fff;
+}
+
+.timeline-move-btn:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+@media (max-width: 768px) {
+    .timeline-move-btn {
+        width: 32px;
+        height: 17px;
+        font-size: 9px;
+    }
+}
+
+.timeline-chevron {
+    color: var(--text-secondary);
+    font-size: 10px;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+.timeline-chevron.open {
+    transform: rotate(180deg);
+}
+
+.timeline-body {
+    padding: 8px 10px 10px;
+    border-top: 1px solid var(--border);
+    font-size: 11.5px;
+    display: none;
+}
+
+.timeline-body.open {
+    display: block;
+}
+
+.timeline-detail {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 12px;
+    margin-bottom: 8px;
+}
+
+.timeline-detail .label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.timeline-detail .value {
+    color: var(--text-primary);
+}
+
+.timeline-actions {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.timeline-actions button {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10.5px;
+}
+
+/* Undo, not a fourth way forward. Pushed to the right of the row and given a
+   muted outline so it reads as a correction rather than a step in the
+   workflow — it sits next to Advance, which is the button it exists to
+   recover from. */
+.timeline-actions .btn-revert {
+    margin-left: auto;
+    color: var(--text-secondary);
+    border-style: dashed;
+}
+
+.timeline-actions .btn-revert:hover {
+    color: var(--text-primary);
+    border-style: solid;
+}
+
+.tel-link {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.tel-link:hover {
+    text-decoration: underline;
+}
+
+/* ── Inline reason row (replaces prompt()/alert() for skip/cancel) ── */
+.timeline-reason-row {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.timeline-reason-input {
+    flex: 1;
+    min-width: 0;
+    height: 26px;
+    padding: 0 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 11px;
+    font-family: inherit;
+}
+
+.timeline-reason-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.timeline-reason-row button {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10.5px;
+    flex-shrink: 0;
+}
+
+/* ── Proof-of-delivery upload ─────────────────────────────── */
+.timeline-upload-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.timeline-upload-category {
+    height: 26px;
+    font-size: 10.5px;
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+/* A label wrapping a hidden file input — the whole thing is the target, so
+   it stays a comfortable size for a thumb rather than a 12px hit area. */
+.timeline-upload-btn {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10.5px;
+    cursor: pointer;
+}
+
+/* A batch upload disables both buttons, not just the one that fired, so the
+   pair needs to look inert while it runs — otherwise the untouched button
+   reads as available and silently swallows the tap (a disabled control
+   ignores activation forwarded from its label). :has() is the whole check;
+   where it is unsupported this degrades to the previous no-op styling. */
+.timeline-upload-btn:has(input:disabled) {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.timeline-upload-status {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* ── Lazy evidence gallery (photos + video) ───────────────── */
+.timeline-photos-wrap {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.timeline-photos-toggle {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10.5px;
+}
+
+.timeline-photos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.timeline-photos-status {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* ── Phase history log ────────────────────────────────────── */
+.timeline-history-wrap {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+}
+
+.timeline-history-toggle {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 10.5px;
+}
+
+.timeline-history {
+    margin-top: 6px;
+}
+
+.timeline-history-status {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+/* Read down the times first, then across to what changed — the dispatcher's
+   question is almost always "when did this stop become X". */
+.timeline-history-row {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.timeline-history-row .th-time {
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    min-width: 42px;
+}
+
+.timeline-history-row .th-move em {
+    color: var(--text-secondary);
+    font-style: normal;
+}
+
+/* The item wraps the thumbnail so the remove button can be positioned against
+   it. The thumbnail itself stays the anchor and keeps its own box, so nothing
+   about the existing 56px grid changes. */
+.timeline-photo-item {
+    position: relative;
+    display: block;
+    line-height: 0;
+}
+
+.timeline-photo-thumb {
+    display: block;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.timeline-photo-thumb img,
+.timeline-photo-thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* A video thumbnail with preload="metadata" is a still frame and is otherwise
+   indistinguishable from a photo — the badge is the only thing telling a
+   dispatcher there is footage behind it. pointer-events:none so it never
+   swallows the click meant for the anchor underneath. */
+.timeline-photo-badge {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 15px;
+    line-height: 1;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+}
+
+/* Deliberately small and corner-tucked: this deletes evidence permanently, so
+   it must not sit under the thumb where a thumb-sized tap lands. It stays
+   visible rather than hover-only — dispatch uses this panel on a touch screen
+   in the field, where there is no hover. */
+.timeline-photo-remove {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-elevated, #fff);
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.timeline-photo-remove:hover:not(:disabled) {
+    background: var(--danger, #c0392b);
+    border-color: var(--danger, #c0392b);
+    color: #fff;
+}
+
+.timeline-photo-remove:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ── Map markers (Leaflet overrides) ──────────────────────── */
+.vehicle-marker-label {
+    /* width:max-content is the fix for the plate reading as bare white text on
+       the map. Leaflet builds this marker with iconSize [0,0], so the hosting
+       .leaflet-marker-icon is literally 0x0 and this block-level child resolved
+       to width:0 — the painted box was just the 12px of horizontal padding,
+       while white-space:nowrap pushed the plate itself outside it. The dark
+       chip sat behind almost none of the text, leaving near-white type directly
+       on near-white OSM tiles. Sizing the box to its content puts the whole
+       plate back on the chip. */
+    width: max-content;
+    background: var(--surface-2);
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-primary);
+    white-space: nowrap;
+    text-align: center;
+    /* Hairline light ring outside the chip. The basemap is now switchable, so
+       a marker has to survive both a near-white street map and dark satellite
+       imagery — the dark chip separates it from the former, this ring from the
+       latter. */
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.6), 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.stop-marker-icon {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    /* Dark ring plus a light outer hairline, for the same reason as the vehicle
+       chip above: the dark ring defines the dot on a light street map, the
+       light ring defines it on satellite imagery. A plain white border (the
+       original) vanished on light tiles and took the pale grey "planned" state
+       with it. */
+    border: 2px solid rgba(13,17,23,0.85);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.7), 0 1px 4px rgba(0,0,0,0.45);
+}
+
+/* ── Imagery capture-date popup ───────────────────────────── */
+.imagery-popup .leaflet-popup-content-wrapper {
+    background: var(--surface-2);
+    color: var(--text-primary);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+}
+
+.imagery-popup .leaflet-popup-tip {
+    background: var(--surface-2);
+}
+
+.imagery-popup .leaflet-popup-content {
+    margin: 10px 12px;
+}
+
+.imagery-popup a.leaflet-popup-close-button {
+    color: var(--text-secondary);
+}
+
+.imagery-info {
+    font-size: 11.5px;
+    line-height: 1.5;
+}
+
+.imagery-info strong {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.imagery-info table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.imagery-info th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding-right: 10px;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.imagery-info td {
+    color: var(--text-primary);
+}
+
+.imagery-coords,
+.imagery-error {
+    display: block;
+    margin-top: 5px;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* ── Basemap switcher ─────────────────────────────────────── */
+/* Leaflet's layer control ships white-on-white; restyled to match the rest of
+   the dashboard rather than sitting on the map as a bright rectangle. */
+.leaflet-control-layers {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.45);
+    color: var(--text-primary);
+}
+
+.leaflet-control-layers-toggle {
+    background-color: var(--surface-2);
+    border-radius: var(--radius);
+}
+
+.leaflet-control-layers-expanded {
+    padding: 8px 10px;
+}
+
+.leaflet-control-layers-list label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 0;
+}
+
+.leaflet-control-layers-list input[type="radio"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.leaflet-control-layers-separator {
+    border-top-color: var(--border);
+}
+
+.stop-marker-icon.completed { background: var(--success); }
+.stop-marker-icon.current { background: #fb923c; width: 18px; height: 18px; }
+.stop-marker-icon.planned { background: #9ca3af; }
+.stop-marker-icon.arrived { background: #fb923c; }
+.stop-marker-icon.skipped { background: #eab308; }
+.stop-marker-icon.cancelled { background: #f87171; }
+
+/* ── Empty state ──────────────────────────────────────────── */
+.empty-state {
+    padding: 30px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+}
+
+/* ── Responsive tweaks ────────────────────────────────────── */
+/* ── Manage Plans Dropdown ─────────────────────────────────── */
+.manage-plans-wrap {
+    position: relative;
+}
+
+/* Positioned by JS (positionManagePlans in dashboard/main.js), not by CSS.
+   It used to be absolute + right:0 against .manage-plans-wrap, which put the
+   panel's right edge on the button's right edge — fine on a wide window, but
+   the dashboard header wraps, and once the Plans button sits near the left of
+   a wrapped row a 320px panel hangs off the left of the viewport with only
+   part of it visible. Fixed positioning also escapes .dashboard-shell's
+   overflow:hidden, which clipped the bottom of the panel. */
+.manage-plans-dropdown {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 320px;
+    max-width: calc(100vw - 16px);
+    max-height: 420px;
+    background: #161b22;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    z-index: 200;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.manage-plans-dropdown.open {
+    display: flex;
+}
+
+.manage-plans-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.manage-plans-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 4px;
+}
+
+.manage-plans-close:hover {
+    color: var(--text-primary);
+}
+
+.manage-plans-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.manage-plans-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    font-size: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.manage-plans-item:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.manage-plans-item input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+}
+
+.manage-plans-item .plan-item-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manage-plans-item .plan-item-date {
+    font-size: 10px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.manage-plans-item .plan-item-status {
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 1px 6px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.manage-plans-item .plan-item-status.draft {
+    background: rgba(156,163,175,0.15);
+    color: #9ca3af;
+}
+
+.manage-plans-item .plan-item-status.confirmed {
+    background: rgba(56,139,253,0.15);
+    color: var(--accent);
+}
+
+.manage-plans-item .plan-item-status.executing {
+    background: rgba(34,211,238,0.15);
+    color: #22d3ee;
+}
+
+.manage-plans-item .plan-item-status.completed {
+    background: rgba(46,160,67,0.15);
+    color: var(--success);
+}
+
+.manage-plans-actions {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.manage-plans-actions button {
+    flex: 1;
+    height: 30px;
+    font-size: 11px;
+    padding: 0 8px;
+}
+
+.btn-danger {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.3);
+}
+
+.btn-danger:hover {
+    background: rgba(239,68,68,0.25);
+}
+
+.manage-plans-empty {
+    padding: 24px 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+@media (max-width: 1300px) {
+    .dashboard-shell {
+        grid-template-columns: 240px 1fr 280px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .dashboard-shell {
+        grid-template-columns: 220px 1fr 260px;
+    }
+    .dashboard-header .header-nav .btn-nav,
+    .dashboard-header .header-nav .nav-dropdown > .btn-nav {
+        padding: 0 8px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 950px) {
+    .dashboard-shell {
+        grid-template-columns: 200px 1fr 1fr;
+    }
+    .dashboard-right {
+        grid-column: 2;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+    .dashboard-header .header-nav {
+        order: 10;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-header .header-nav {
+        order: 0;
+        width: auto;
+    }
+    .dashboard-shell {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 180px 1fr 0;
+    }
+    .dashboard-left {
+        grid-row: 2;
+        grid-column: 1;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+    .dashboard-center {
+        grid-row: 3;
+        grid-column: 1;
+    }
+    .dashboard-right {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 85vw;
+        max-width: 380px;
+        height: 100vh;
+        z-index: 2000;
+        box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        border-left: 1px solid var(--border);
+    }
+    .dashboard-right.open {
+        transform: translateX(0);
+    }
+    .map-controls {
+        top: auto;
+        bottom: 60px;
+        right: 8px;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    .vehicle-info-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+    .vibar-right {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-filters {
+        display: none;
+    }
+    .dashboard-left .vehicle-list {
+        padding: 4px;
+    }
+    .vehicle-card {
+        padding: 8px 10px;
+    }
+    .vc-meta {
+        flex-direction: column;
+        gap: 2px;
+    }
+}

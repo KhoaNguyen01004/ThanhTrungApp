@@ -1,0 +1,915 @@
+{
+ "version": "0.6",
+ "reqId": "0",
+ "status": "ok",
+ "table": {
+  "cols": [
+   {
+    "id": "A",
+    "label": "date",
+    "type": "string"
+   },
+   {
+    "id": "B",
+    "label": "Nhà Xe",
+    "type": "string"
+   },
+   {
+    "id": "C",
+    "label": "SỐ XE",
+    "type": "string"
+   },
+   {
+    "id": "D",
+    "label": "TÀI XẾ",
+    "type": "string"
+   },
+   {
+    "id": "E",
+    "label": "CMND",
+    "type": "string"
+   },
+   {
+    "id": "F",
+    "label": "SĐT",
+    "type": "string"
+   },
+   {
+    "id": "G",
+    "label": "Loại xe (tải trọng)",
+    "type": "string"
+   },
+   {
+    "id": "H",
+    "label": "STT ƯU TIÊN",
+    "type": "string"
+   },
+   {
+    "id": "I",
+    "label": "TRẠM PHÁT (MÃ TRẠM)",
+    "type": "string"
+   },
+   {
+    "id": "J",
+    "label": "GHI CHÚ PHÁT SINH",
+    "type": "string"
+   },
+   {
+    "id": "K",
+    "label": "SỐ KGS",
+    "type": "string"
+   },
+   {
+    "id": "L",
+    "label": "Tọa độ (LAT)",
+    "type": "string"
+   },
+   {
+    "id": "M",
+    "label": "Tọa độ (Long)",
+    "type": "string"
+   },
+   {
+    "id": "N",
+    "label": "ĐỊA CHỈ GIAO HÀNG",
+    "type": "string"
+   },
+   {
+    "id": "O",
+    "label": "TỈNH",
+    "type": "string"
+   },
+   {
+    "id": "P",
+    "label": "HUYỆN",
+    "type": "string"
+   },
+   {
+    "id": "Q",
+    "label": "THÔNG TIN QUẢN LÝ TRẠM",
+    "type": "string"
+   },
+   {
+    "id": "R",
+    "label": "SDT",
+    "type": "string"
+   },
+   {
+    "id": "S",
+    "label": "",
+    "type": "string"
+   },
+   {
+    "id": "T",
+    "label": "",
+    "type": "string"
+   },
+   {
+    "id": "U",
+    "label": "",
+    "type": "string"
+   },
+   {
+    "id": "V",
+    "label": "",
+    "type": "string"
+   }
+  ],
+  "rows": [
+   {
+    "c": [
+     {
+      "v": "21-Jul"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H 19793"
+     },
+     {
+      "v": "NGUYỄN TUẤN TÚ"
+     },
+     {
+      "v": "079090008130"
+     },
+     {
+      "v": "337482130"
+     },
+     {
+      "v": "2.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "TVDI10"
+     },
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9,636058"
+     },
+     {
+      "v": "106,491648"
+     },
+     {
+      "v": "Khóm 2, Phường Duyên Hải, Vĩnh Long"
+     },
+     {
+      "v": "Trà Vinh"
+     },
+     {
+      "v": "DuyênHải(Thịxã)"
+     },
+     {
+      "v": "Văn Thành Hậu"
+     },
+     {
+      "v": "796957666"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Không có khó khăn"
+     },
+     {
+      "v": "Mang vác vận chuyển bình thường (thủ công)"
+     },
+     {
+      "v": "0"
+     }
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "21-Jul"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "2"
+     },
+     {
+      "v": "TVDI08"
+     },
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9,638763"
+     },
+     {
+      "v": "106,502129"
+     },
+     {
+      "v": "Khóm 3, Phường Duyên Hải, Vĩnh Long"
+     },
+     {
+      "v": "Trà Vinh"
+     },
+     {
+      "v": "DuyênHải(Thịxã)"
+     },
+     {
+      "v": "Văn Thành Hậu"
+     },
+     {
+      "v": "796957666"
+     },
+     {
+      "v": "#N/A"
+     },
+     {
+      "v": "#N/A"
+     },
+     {
+      "v": "#N/A"
+     },
+     {
+      "v": "#N/A"
+     }
+    ]
+   },
+   {
+    "c": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H-939.63"
+     },
+     {
+      "v": "NGÔ HỮU QUÍ"
+     },
+     {
+      "v": "037 5646746"
+     },
+     {
+      "v": "51092005917"
+     },
+     {
+      "v": "2.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "STST28"
+     },
+     {
+      "v": "dô hẻm cỡ gần 200m"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9.585.868"
+     },
+     {
+      "v": "1.059.744"
+     },
+     {
+      "v": "Khóm 5, Phường Phú Lợi, Cần Thơ"
+     },
+     {
+      "v": "Sóc Trăng"
+     },
+     {
+      "v": "Thành phố Sóc Trăng"
+     },
+     {
+      "v": "Lý Minh Tần"
+     },
+     {
+      "v": "932922959"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Hẻm nhỏ không chạy xe ba gác được, vòng xa đường lớn 500m"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "2"
+     },
+     {
+      "v": "STST27"
+     },
+     {
+      "v": "k có phòng để hàng chỗ của công an. đã dời trạm qua chỗ công an xin tọa độ mới"
+     },
+     {
+      "v": "Newbuild 5G Single 3.8 64T"
+     },
+     {
+      "v": "9.591.387"
+     },
+     {
+      "v": "1.059.742"
+     },
+     {
+      "v": "Số 122/7, Lê Văn Tám, Khóm 4, Phường Phú Lợi, Cần Thơ"
+     },
+     {
+      "v": "Sóc Trăng"
+     },
+     {
+      "v": "Thành phố Sóc Trăng"
+     },
+     {
+      "v": "Lý Minh Tần"
+     },
+     {
+      "v": "932922959"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Mang vác lên tầng 2, cầu thang xoắn khó chuyển lên"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "3"
+     },
+     {
+      "v": "STST15"
+     },
+     {
+      "v": "đẩy hàng vào cỡ mấy chục mét"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9.60967"
+     },
+     {
+      "v": "105.9544"
+     },
+     {
+      "v": "115 Đường Nam Kỳ Khởi Nghĩa, Khóm 5, Phường Sóc Trăng, Cần Thơ"
+     },
+     {
+      "v": "Sóc Trăng"
+     },
+     {
+      "v": "Thành phố Sóc Trăng"
+     },
+     {
+      "v": "Lý Minh Tần"
+     },
+     {
+      "v": "932922959"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Xe tải tới trạm, bốc tay vào 100m"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "4"
+     },
+     null,
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9.6301"
+     },
+     {
+      "v": "105.9672"
+     },
+     {
+      "v": "KDC Minh Châu, Quốc Lộ 1, Phường Sóc Trăng, Cần Thơ"
+     },
+     {
+      "v": "Sóc Trăng"
+     },
+     {
+      "v": "Thành phố Sóc Trăng"
+     },
+     {
+      "v": "Lý Minh Tần"
+     },
+     {
+      "v": "932922959"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Xe tải tới trạm, bốc tay vào 50m"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H-197.93"
+     },
+     {
+      "v": "NGUYỄN TUẤN TÚ"
+     },
+     {
+      "v": "79090008130"
+     },
+     {
+      "v": "337482130"
+     },
+     {
+      "v": "2.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "AGCT33"
+     },
+     {
+      "v": "trạm k có chỗ để phòng tb, đậu xe ngoài lộ 130m"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "10.4568"
+     },
+     {
+      "v": "105.3117"
+     },
+     {
+      "v": "Ấp Phú An 1, Xã Bình Hòa, An Giang"
+     },
+     {
+      "v": "An Giang"
+     },
+     {
+      "v": "ChâuThành"
+     },
+     {
+      "v": "Nguyễn Hải Đăng"
+     },
+     {
+      "v": "788999636"
+     },
+     {
+      "v": "Không có chỗ để cần bố trí team đội & xe thu hồi ngay"
+     },
+     {
+      "v": "0"
+     },
+     {
+      "v": "150"
+     },
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "2"
+     },
+     {
+      "v": "AGCT26"
+     },
+     {
+      "v": "xe tới chỗ đc"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     null,
+     null,
+     {
+      "v": "Ấp Phú Hòa 1, Xã Bình Hòa, An Giang"
+     },
+     {
+      "v": "An Giang"
+     },
+     {
+      "v": "ChâuThành"
+     },
+     {
+      "v": "Tổ VT AG"
+     },
+     {
+      "v": "788999636"
+     },
+     {
+      "v": "Có chỗ để thiết bị sau swap"
+     },
+     {
+      "v": "0"
+     },
+     {
+      "v": "0"
+     },
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "3"
+     },
+     {
+      "v": "Non HW Delivery-DU"
+     },
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     null,
+     {
+      "v": "12.7"
+     },
+     {
+      "v": "999.9"
+     },
+     null,
+     {
+      "v": "An Giang"
+     },
+     {
+      "v": "ChâuThành"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H-791.07"
+     },
+     {
+      "v": "TRẦN HOÀNG QUÂN"
+     },
+     {
+      "v": "079095016088"
+     },
+     {
+      "v": "039 5341851"
+     },
+     {
+      "v": "2.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "KGGRX2"
+     },
+     {
+      "v": "có mặt 7h có đội lắp trong ngày"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9.98157"
+     },
+     {
+      "v": "105.4331"
+     },
+     {
+      "v": "ấp Nguyễn Văn Thới, Xã Thạnh Hưng, An Giang"
+     },
+     {
+      "v": "Kiên Giang"
+     },
+     {
+      "v": "GiồngRiềng"
+     },
+     {
+      "v": "Võ Thành Công"
+     },
+     {
+      "v": "0939 980 584"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Thuê xe ba gác vận chuyển đến trạm"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "10-Aug"
+     },
+     null,
+     null,
+     null,
+     null,
+     null,
+     null,
+     {
+      "v": "x"
+     },
+     {
+      "v": "CTCD15"
+     },
+     {
+      "v": "đẩy xe rùa vào"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "10.07887"
+     },
+     {
+      "v": "105.4211"
+     },
+     {
+      "v": "Số 137, Ấp Thới Hòa C, Xã Cờ Đỏ, Cần Thơ"
+     },
+     {
+      "v": "Cần Thơ"
+     },
+     {
+      "v": "CờĐỏ"
+     },
+     {
+      "v": "Nguyễn Hữu Út Mười"
+     },
+     {
+      "v": "939568724"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Đường bê tông nhỏ 3.5m"
+     },
+     null,
+     null
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "01-th8"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H-943.82"
+     },
+     {
+      "v": "LÊ VĂN THUẬN"
+     },
+     {
+      "v": "080011122233"
+     },
+     {
+      "v": "0909 111 222"
+     },
+     {
+      "v": "1.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "VLVM45"
+     },
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9,97482"
+     },
+     {
+      "v": "106,09197"
+     },
+     {
+      "v": "Ấp Hiếu Văn, Xã Hiếu Thành, Vĩnh Long"
+     },
+     {
+      "v": "Vĩnh Long"
+     },
+     {
+      "v": "VũngLiêm"
+     },
+     {
+      "v": "Nguyễn Văn Bay"
+     },
+     {
+      "v": "907380322"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     {
+      "v": "Không có khó khăn"
+     },
+     {
+      "v": "Xe tải tới trạm"
+     },
+     {
+      "v": "0"
+     }
+    ]
+   },
+   {
+    "c": [
+     {
+      "v": "25-Dec"
+     },
+     {
+      "v": "TT"
+     },
+     {
+      "v": "50H-948.19"
+     },
+     {
+      "v": "NGUYỄN THANH GIANG"
+     },
+     {
+      "v": "089082013494"
+     },
+     {
+      "v": "038 8195850"
+     },
+     {
+      "v": "1.5T"
+     },
+     {
+      "v": "1"
+     },
+     {
+      "v": "KGHT02"
+     },
+     {
+      "v": "KHÔNG CÓ PHÁT SINH"
+     },
+     {
+      "v": "Newbuild 5G Single 2.6 32T"
+     },
+     {
+      "v": "9,912"
+     },
+     {
+      "v": "105,1234"
+     },
+     {
+      "v": "Ấp Hòa Thuận, Kiên Giang"
+     },
+     {
+      "v": "Kiên Giang"
+     },
+     {
+      "v": "HònĐất"
+     },
+     {
+      "v": "Trần Văn A"
+     },
+     {
+      "v": "0900000000"
+     },
+     {
+      "v": "Để được trong phòng máy thiết bị"
+     },
+     null,
+     null,
+     null
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Truck Load Planner — Fleet Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/konva@9/konva.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Full-screen shell ─────────────────────────────────── */
+        .tlp-shell {
+            display: grid;
+            grid-template-rows: 52px 1fr 28px;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── Toolbar ───────────────────────────────────────────── */
+        .tlp-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: 52px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .tlp-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .tlp-toolbar-left a {
+            color: var(--accent);
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .tlp-toolbar-left a:hover {
+            color: var(--accent-hover);
+        }
+
+        .tlp-toolbar-left h1 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .tlp-toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            flex-shrink: 0;
+        }
+
+        .tlp-toolbar-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tlp-toolbar-info strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .tlp-toolbar-center {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tlp-toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-tb {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+            padding: 0 10px;
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all var(--transition);
+        }
+
+        .btn-tb:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-tb-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .btn-tb-primary:hover {
+            background: var(--accent-hover);
+            color: #fff;
+        }
+
+        .btn-tb-accent {
+            background: #8b5cf6;
+            color: #fff;
+            font-weight: 600;
+            padding: 0 12px;
+        }
+
+        .btn-tb-accent:hover {
+            background: #7c3aed;
+        }
+
+        .btn-tb-icon {
+            width: 30px;
+            padding: 0;
+            font-size: 14px;
+        }
+
+        .btn-tb-icon-lg {
+            width: 32px;
+            padding: 0;
+            font-size: 15px;
+        }
+
+        /* ── Main layout (3-column) ────────────────────────────── */
+        .tlp-body {
+            display: grid;
+            grid-template-columns: 280px 1fr 260px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ── Left Sidebar ──────────────────────────────────────── */
+        .tlp-left {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        .tlp-left .tlp-section {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tlp-left .tlp-section:last-child {
+            border-bottom: none;
+        }
+
+        .tlp-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tlp-vehicle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            font-size: 12px;
+        }
+
+        .tlp-vehicle-label {
+            color: var(--text-muted);
+        }
+
+        .tlp-vehicle-value {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .tlp-shipment-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2px 0;
+            font-size: 12px;
+        }
+
+        .tlp-shipment-label {
+            color: var(--text-muted);
+        }
+
+        .tlp-shipment-value {
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .btn-section {
+            display: block;
+            width: 100%;
+            margin-top: 8px;
+            height: 30px;
+            padding: 0 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .btn-section:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-primary);
+        }
+
+        /* Package filters */
+        .tlp-pkg-filters {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .tlp-pkg-filters select {
+            flex: 0 0 auto;
+            height: 28px;
+            padding: 0 8px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .tlp-pkg-filters select option {
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+
+        .tlp-pkg-filters select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .tlp-pkg-search {
+            flex: 1;
+            height: 28px;
+            padding: 0 8px;
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .tlp-pkg-search::placeholder {
+            color: var(--text-muted);
+        }
+
+        .tlp-pkg-search:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .tlp-package-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .tlp-pkg-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+            user-select: none;
+        }
+
+        .tlp-pkg-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--border);
+        }
+
+        .tlp-pkg-card:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tlp-pkg-card.placed-all {
+            opacity: 0.35;
+        }
+
+        .tlp-pkg-card.selected {
+            background: rgba(47, 140, 235, 0.15);
+            border-color: var(--accent);
+        }
+
+        .tlp-pkg-swatch {
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .tlp-pkg-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tlp-pkg-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .tlp-pkg-dims {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .tlp-stack-badge {
+            font-size: 8px;
+            font-weight: 600;
+            padding: 1px 5px;
+            border-radius: 99px;
+            white-space: nowrap;
+            display: inline-block;
+            line-height: 1.4;
+        }
+
+        .tlp-stack-badge.stackable {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .tlp-stack-badge.non-stackable {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .tlp-pkg-qty {
+            font-size: 10px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .tlp-pkg-qty strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* ── Center Workspace ──────────────────────────────────── */
+        .tlp-center {
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        #tlp-canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* View Controls */
+        .tlp-view-ctrls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 3px;
+        }
+
+        .view-btn {
+            height: 26px;
+            padding: 0 10px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            border-radius: 4px;
+            transition: all var(--transition);
+        }
+
+        .view-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+        }
+
+        .view-btn.active {
+            background: rgba(47, 140, 235, 0.2);
+            color: var(--accent);
+        }
+
+        .view-btn-icon {
+            width: 26px;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        .view-sep {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 2px;
+        }
+
+        /* ── Right Sidebar ─────────────────────────────────────── */
+        .tlp-right {
+            background: var(--surface);
+            border-left: 1px solid var(--border);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .tlp-stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+        }
+
+        .tlp-stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .tlp-stat-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .tlp-stat-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+        }
+
+        .tlp-progress-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .tlp-progress-bar {
+            height: 4px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, 0.06);
+            overflow: hidden;
+        }
+
+        .tlp-progress-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.25s;
+        }
+
+        .tlp-progress-fill.green {
+            background: var(--success);
+        }
+
+        .tlp-progress-fill.yellow {
+            background: var(--warning);
+        }
+
+        .tlp-progress-fill.red {
+            background: var(--danger);
+        }
+
+        .tlp-door-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+        }
+
+        .tlp-door-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .tlp-door-badge {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: 99px;
+        }
+
+        .tlp-door-badge.accessible {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--success);
+        }
+
+        .tlp-door-badge.blocked {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        .tlp-door-badge.na {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+        }
+
+        .tlp-validation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .tlp-val-item {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 0;
+        }
+
+        .tlp-val-item .icon {
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .tlp-val-item.valid {
+            color: var(--success);
+        }
+
+        .tlp-val-item.invalid {
+            color: var(--danger);
+        }
+
+        .tlp-val-item.neutral {
+            color: var(--text-muted);
+        }
+
+        .tlp-sequence-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .tlp-seq-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 0;
+            font-size: 11px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .tlp-seq-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            flex-shrink: 0;
+            background: rgba(47, 140, 235, 0.12);
+            color: var(--accent);
+        }
+
+        .tlp-empty-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* ── 3D Container ─────────────────────────────────────── */
+        #tlp-3d-container {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 360px;
+            height: 280px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg);
+            z-index: 20;
+            box-shadow: var(--shadow-lg);
+            resize: both;
+        }
+
+        #tlp-3d-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            border: none;
+            border-radius: 0;
+            resize: none;
+        }
+
+        #tlp-3d-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #btn-3d-toggle.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        /* ── 3D Toolbar ───────────────────────────────────────── */
+        #tlp-3d-toolbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0 8px;
+            background: rgba(13, 17, 23, 0.88);
+            z-index: 1;
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #tlp-3d-container:hover #tlp-3d-toolbar,
+        #tlp-3d-container.fullscreen #tlp-3d-toolbar {
+            opacity: 1;
+        }
+
+        .btn-3d {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #c9d1d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            padding: 2px 8px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            transition: background 0.15s;
+        }
+
+        .btn-3d:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-3d.icon {
+            font-size: 13px;
+            padding: 2px 6px;
+        }
+
+        .btn-3d.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .tlp-3d-spacer {
+            flex: 1;
+        }
+
+        #tlp-3d-step-counter {
+            color: #c9d1d9;
+            font-size: 11px;
+            min-width: 50px;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Status Bar ────────────────────────────────────────── */
+        .tlp-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 16px;
+            height: 28px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .tlp-status-bar strong {
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        /* ── Modals ────────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(6px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 480px;
+            margin: 16px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(16px) scale(0.97);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-top {
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.06);
+            border: none;
+            color: var(--text-muted);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all var(--transition);
+        }
+
+        .btn-close:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+        }
+
+        .modal-body {
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .field-input,
+        .field-select {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-family: inherit;
+            width: 100%;
+        }
+
+        .field-input:focus,
+        .field-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .field-select option {
+            background: var(--surface-2);
+            color: var(--text-primary);
+        }
+
+        .modal-footer {
+            padding: 12px 20px 18px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 18px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .btn-save {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            padding: 8px 22px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .btn-save:hover {
+            background: var(--accent-hover);
+        }
+
+        .modal-select-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .modal-select-item {
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .modal-select-item:hover {
+            background: rgba(47, 140, 235, 0.08);
+            border-color: var(--accent);
+        }
+
+        .modal-select-item .name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-select-item .desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ── Toast ─────────────────────────────────────────────── */
+        #toast-container {
+            position: fixed;
+            bottom: 40px;
+            right: 20px;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-end;
+        }
+
+        .toast {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--text-primary);
+            box-shadow: var(--shadow);
+            max-width: 340px;
+            animation: slideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-left: 3px solid transparent;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast.info {
+            border-left-color: var(--accent);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(80px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ── Responsive ────────────────────────────────────────── */
+        @media (max-width: 1100px) {
+            .tlp-body {
+                grid-template-columns: 240px 1fr 220px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .tlp-body {
+                grid-template-columns: 1fr;
+            }
+
+            .tlp-left,
+            .tlp-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="tlp-shell">
+        <!-- ═══════════ TOOLBAR ═══════════ -->
+        <div class="tlp-toolbar">
+            <div class="tlp-toolbar-left">
+                <a href="/">&larr; Dashboard</a>
+                <h1>Truck Load Planner</h1>
+                <div class="tlp-toolbar-divider"></div>
+                <span class="tlp-toolbar-info" id="toolbar-vehicle">Vehicle: <strong id="tb-vehicle-name">—</strong>
+                    <button id="btn-deselect-vehicle" onclick="app.deselectVehicle()" title="Deselect vehicle"
+                        style="display:none;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;padding:0 2px;margin-left:2px;">&times;</button></span>
+                <span class="tlp-toolbar-info" id="toolbar-shipment" style="display:none;">| Shipment: <strong
+                        id="tb-shipment-name">—</strong></span>
+            </div>
+            <div class="tlp-toolbar-center">
+                <button class="btn-tb btn-tb-primary" onclick="app.savePlan()">Save</button>
+                <button class="btn-tb" onclick="app.saveAsPlan()">Save As</button>
+                <button class="btn-tb" onclick="app.openLoadDialog()">Load</button>
+                <button class="btn-tb" onclick="app.exportPlan()">Export</button>
+                <div class="tlp-toolbar-divider"></div>
+                <button class="btn-tb btn-tb-icon" onclick="app.undo()" title="Undo (Ctrl+Z)">&larr;</button>
+                <button class="btn-tb btn-tb-icon" onclick="app.redo()" title="Redo (Ctrl+Shift+Z)">&rarr;</button>
+                <div class="tlp-toolbar-divider"></div>
+                <button class="btn-tb btn-tb-icon" onclick="app.rotateSelected(-1)"
+                    title="Rotate Counter-Clockwise (Q)">&#8630;</button>
+                <button class="btn-tb btn-tb-icon" onclick="app.rotateSelected(1)"
+                    title="Rotate Clockwise (E)">&#8631;</button>
+                <button class="btn-tb btn-tb-icon" onclick="app.deleteSelected()" title="Delete Selected (Del)"
+                    style="color:var(--danger);">&times;</button>
+                <div class="tlp-toolbar-divider"></div>
+                <div class="tlp-profile-selector" style="display:inline-flex;align-items:center;gap:4px;">
+                    <button class="btn-tb btn-tb-accent" onclick="app.autoArrange()"
+                        title="Auto Arrange all packages">&#10024; Auto Arrange</button>
+                    <select id="profile-select"
+                        style="font-size:11px;padding:2px 4px;border-radius:4px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);cursor:pointer;"
+                        title="Optimization profile">
+                        <option value="fast">&#9889; Fast</option>
+                        <option value="balanced" selected>&#9878; Balanced</option>
+                        <option value="maximum_quality">&#127919; Maximum Quality</option>
+                    </select>
+                    <span id="optimization-status"
+                        style="display:none;font-size:11px;color:var(--text-secondary);margin-left:4px;"></span>
+                </div>
+                <div class="tlp-toolbar-divider"></div>
+                <button class="btn-tb" id="btn-step-prev" onclick="app.stepPrev()" title="Previous step"
+                    style="display:none">&#9664;</button>
+                <span id="step-counter"
+                    style="display:none;color:var(--text);font-size:12px;margin:0 4px;min-width:60px;text-align:center">0/0</span>
+                <button class="btn-tb" id="btn-step-next" onclick="app.stepNext()" title="Next step"
+                    style="display:none">&#9654;</button>
+                <button class="btn-tb" id="btn-step-play" onclick="app.stepPlay()" title="Play all steps"
+                    style="display:none">&#9654;&#9654;</button>
+                <button class="btn-tb" id="btn-step-end" onclick="app.stepEnd()" title="Show all"
+                    style="display:none">&#9197;</button>
+            </div>
+            <div class="tlp-toolbar-right">
+                <button class="btn-tb btn-tb-icon" id="btn-toggle-grid" onclick="app.toggleGrid()"
+                    title="Toggle Grid">&#9638;</button>
+                <button class="btn-tb btn-tb-icon" id="btn-toggle-snap" onclick="app.toggleSnap()"
+                    title="Toggle Snap">&#8904;</button>
+                <button class="btn-tb btn-tb-icon" onclick="app.openHelp()" title="Help">?</button>
+            </div>
+        </div>
+
+        <!-- ═══════════ BODY (3-column) ═══════════ -->
+        <div class="tlp-body">
+
+            <!-- ─── LEFT SIDEBAR ─── -->
+            <div class="tlp-left">
+
+                <!-- Vehicle -->
+                <div class="tlp-section">
+                    <div class="tlp-section-title">Vehicle</div>
+                    <div id="vehicle-info">
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Name</span><span
+                                class="tlp-vehicle-value" id="v-name">—</span></div>
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Plate</span><span
+                                class="tlp-vehicle-value" id="v-plate">—</span></div>
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Driver</span><span
+                                class="tlp-vehicle-value" id="v-driver">—</span></div>
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Dims
+                                (L&times;W&times;H)</span><span class="tlp-vehicle-value" id="v-dims">—</span></div>
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Payload</span><span
+                                class="tlp-vehicle-value" id="v-payload">—</span></div>
+                        <div class="tlp-vehicle-row"><span class="tlp-vehicle-label">Remaining</span><span
+                                class="tlp-vehicle-value" id="v-remaining">—</span></div>
+                    </div>
+                    <button class="btn-section" onclick="app.openVehicleSelector()">Change Vehicle</button>
+                </div>
+
+                <!-- Vehicle Results (after auto-arrange) -->
+                <div class="tlp-section" id="arrange-results-section" style="display:none">
+                    <div class="tlp-section-title">Arrange Results</div>
+                    <div id="arrange-results-list"></div>
+                </div>
+
+                <!-- Shipment -->
+                <div class="tlp-section">
+                    <div class="tlp-section-title">Shipment</div>
+                    <div id="shipment-section-view">
+                        <div id="shipment-info">
+                            <div class="tlp-shipment-row"><span class="tlp-shipment-label">Name</span><span
+                                    class="tlp-shipment-value" id="s-name">—</span></div>
+                            <div class="tlp-shipment-row"><span class="tlp-shipment-label">Customer</span><span
+                                    class="tlp-shipment-value" id="s-customer">—</span></div>
+                            <div class="tlp-shipment-row"><span class="tlp-shipment-label">Reference</span><span
+                                    class="tlp-shipment-value" id="s-ref">—</span></div>
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:6px;">
+                            <button class="btn-section" onclick="app.openShipmentSelector()"
+                                style="flex:1;">Select</button>
+                            <button class="btn-section" onclick="app.editShipment()" style="flex:1;">Edit</button>
+                            <button class="btn-section" onclick="app.createShipment()"
+                                style="flex:0;padding:0 8px;">+New</button>
+                        </div>
+                    </div>
+                    <div id="shipment-section-edit" style="display:none;">
+                        <div class="field-group" style="margin-bottom:4px;">
+                            <label class="field-label" style="font-size:10px;">Customer</label>
+                            <input id="s-edit-customer" class="field-input" style="font-size:12px;padding:5px 8px;"
+                                placeholder="Customer name">
+                        </div>
+                        <div class="field-group" style="margin-bottom:4px;">
+                            <label class="field-label" style="font-size:10px;">Reference</label>
+                            <input id="s-edit-ref" class="field-input" style="font-size:12px;padding:5px 8px;"
+                                placeholder="Reference / PO #">
+                        </div>
+                        <div class="field-group" style="margin-bottom:4px;">
+                            <label class="field-label" style="font-size:10px;">Notes</label>
+                            <input id="s-edit-notes" class="field-input" style="font-size:12px;padding:5px 8px;"
+                                placeholder="Optional notes">
+                        </div>
+                        <div id="s-edit-items" style="margin:4px 0;"></div>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                            <select id="s-edit-add-pkg"
+                                style="flex:1;height:26px;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);font-family:inherit;">
+                                <option value="">+ Add package...</option>
+                            </select>
+                            <input id="s-edit-add-qty" type="number" min="1" value="1"
+                                style="width:40px;height:26px;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);text-align:center;">
+                            <button class="btn-section" onclick="app.addShipmentItem()"
+                                style="flex:0;padding:0 8px;font-size:11px;height:26px;">Add</button>
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:6px;">
+                            <button class="btn-section" onclick="app.saveShipment()"
+                                style="flex:1;background:rgba(47,140,235,0.15);color:var(--accent);">Save</button>
+                            <button class="btn-section" onclick="app.cancelEditShipment()"
+                                style="flex:1;">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Package List -->
+                <div class="tlp-section">
+                    <div class="tlp-section-title" style="margin-bottom:4px;">
+                        <span>Packages</span>
+                        <button class="btn-section" onclick="app.openPackageEditor()"
+                            style="display:inline;width:auto;padding:0 10px;font-size:10px;height:22px;margin:0;">+
+                            Package</button>
+                        <button class="btn-section" onclick="app.clearAllPackages()"
+                            style="display:inline;width:auto;padding:0 10px;font-size:10px;height:22px;margin:0 0 0 4px;color:var(--danger);">Clear
+                            All</button>
+                    </div>
+                    <!-- Inline Package Editor -->
+                    <div id="pkg-editor"
+                        style="display:none;margin-bottom:6px;padding:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm);">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:4px;">
+                            <div><label style="font-size:9px;color:var(--text-muted);">L mm</label><input type="number"
+                                    id="pkg-edit-l" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                    placeholder="1000"></div>
+                            <div><label style="font-size:9px;color:var(--text-muted);">W mm</label><input type="number"
+                                    id="pkg-edit-w" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                    placeholder="800"></div>
+                            <div><label style="font-size:9px;color:var(--text-muted);">H mm</label><input type="number"
+                                    id="pkg-edit-h" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                    placeholder="600"></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;">
+                            <div><label style="font-size:9px;color:var(--text-muted);">Name</label><input
+                                    id="pkg-edit-name" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                    placeholder="Package name"></div>
+                            <div><label style="font-size:9px;color:var(--text-muted);">Weight kg</label><input
+                                    type="number" id="pkg-edit-weight" class="field-input"
+                                    style="font-size:11px;padding:3px 6px;" placeholder="20"></div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;">
+                            <div><label style="font-size:9px;color:var(--text-muted);">Color</label>
+                                <input type="color" id="pkg-edit-color" value="#3b82f6"
+                                    style="width:100%;height:22px;padding:0;border:1px solid var(--border);border-radius:3px;background:none;cursor:pointer;">
+                            </div>
+                            <div><label style="font-size:9px;color:var(--text-muted);">Quantity</label>
+                                <input type="number" id="pkg-edit-qty" class="field-input"
+                                    style="font-size:11px;padding:3px 6px;" placeholder="1" min="1">
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            <input type="checkbox" id="pkg-edit-stackable" style="cursor:pointer;">
+                            <label for="pkg-edit-stackable"
+                                style="font-size:10px;color:var(--text-muted);cursor:pointer;">Allow stacking on
+                                top</label>
+                        </div>
+                        <div style="display:flex;gap:4px;">
+                            <button class="btn-section" onclick="app.savePackage()"
+                                style="flex:1;font-size:10px;height:24px;background:rgba(47,140,235,0.15);color:var(--accent);"
+                                id="pkg-save-btn">Create</button>
+                            <button class="btn-section" onclick="app.cancelPackageEditor()"
+                                style="flex:0;font-size:10px;height:24px;padding:0 10px;">Cancel</button>
+                        </div>
+                    </div>
+                    <div class="tlp-pkg-filters" style="margin-bottom:4px;">
+                        <input class="tlp-pkg-search" id="pkg-search-input" type="text" placeholder="Search..."
+                            oninput="app.filterPackages()">
+                    </div>
+                    <div style="display:flex;gap:4px;margin-bottom:6px;">
+                        <button class="view-btn active" id="pkg-tab-unplaced" onclick="app.setPkgTab('unplaced')"
+                            style="flex:1;font-size:10px;">Unplaced</button>
+                        <button class="view-btn" id="pkg-tab-placed" onclick="app.setPkgTab('placed')"
+                            style="flex:1;font-size:10px;">Placed</button>
+                    </div>
+                    <div id="tlp-package-list" class="tlp-package-list" style="max-height:300px;overflow-y:auto;"></div>
+                </div>
+            </div>
+
+            <!-- ─── CENTER ─── -->
+            <div class="tlp-center">
+                <div class="tlp-view-ctrls" id="view-controls">
+                    <button class="view-btn active" data-view="top" onclick="app.switchView('top')">Top</button>
+                    <button class="view-btn" data-view="side" onclick="app.switchView('side')">Side</button>
+                    <button class="view-btn" data-view="back" onclick="app.switchView('back')">Back</button>
+                    <div class="view-sep"></div>
+                    <button class="view-btn view-btn-icon" onclick="app.fitToScreen()"
+                        title="Fit to Screen">&#8862;</button>
+                    <button class="view-btn view-btn-icon" onclick="app.resetView()" title="Reset View">&#8634;</button>
+                    <div class="view-sep"></div>
+                    <button class="view-btn view-btn-icon" onclick="app.zoomIn()" title="Zoom In">+</button>
+                    <button class="view-btn view-btn-icon" onclick="app.zoomOut()" title="Zoom Out">&minus;</button>
+                    <div class="view-sep"></div>
+                    <button class="view-btn view-btn-icon" id="btn-grid-toggle" onclick="app.toggleGrid()"
+                        title="Toggle Grid">&#9638;</button>
+                    <div class="view-sep"></div>
+                    <button class="view-btn" id="btn-3d-toggle" onclick="app.toggle3D()"
+                        title="Toggle 3D Preview">3D</button>
+                </div>
+                <div id="tlp-canvas-container"></div>
+                <div id="tlp-3d-container" style="display:none;">
+                    <div id="tlp-3d-toolbar">
+                        <span id="tlp-3d-step-counter" style="display:none">0/0</span>
+                        <button class="btn-3d icon" id="tlp-3d-btn-prev" onclick="app.stepPrev()" title="Previous step"
+                            style="display:none">&#9664;</button>
+                        <button class="btn-3d icon" id="tlp-3d-btn-next" onclick="app.stepNext()" title="Next step"
+                            style="display:none">&#9654;</button>
+                        <button class="btn-3d icon" id="tlp-3d-btn-play" onclick="app.stepPlay()" title="Play all steps"
+                            style="display:none">&#9654;&#9654;</button>
+                        <button class="btn-3d icon" id="tlp-3d-btn-end" onclick="app.stepEnd()" title="Show all"
+                            style="display:none">&#9197;</button>
+                        <div class="tlp-3d-spacer"></div>
+                        <button class="btn-3d icon" id="tlp-3d-btn-fullscreen" onclick="app.toggle3DFullscreen()"
+                            title="Toggle Fullscreen (F)">&#9974;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── RIGHT SIDEBAR ─── -->
+            <div class="tlp-right">
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Packages Placed</div>
+                    <div class="tlp-stat-value"><span id="status-count-now">0</span> / <span
+                            id="status-count-total">0</span></div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Total Sorted (All Vehicles)</div>
+                    <div class="tlp-stat-value"><span id="status-sorted-total">0</span></div>
+                    <div class="tlp-stat-sub" id="status-sorted-vehicles">—</div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Weight</div>
+                    <div class="tlp-progress-row"><span id="status-weight-now">0 kg</span><span id="status-weight-max">0
+                            kg</span></div>
+                    <div class="tlp-progress-bar">
+                        <div class="tlp-progress-fill green" id="status-weight-bar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Volume</div>
+                    <div class="tlp-progress-row"><span id="status-vol-now">0.00 m&sup3;</span><span
+                            id="status-vol-max">0.00 m&sup3;</span></div>
+                    <div class="tlp-progress-bar">
+                        <div class="tlp-progress-fill green" id="status-vol-bar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Floor Utilization</div>
+                    <div class="tlp-stat-value" id="status-floor">0%</div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Doors</div>
+                    <div id="tlp-door-status">
+                        <div class="tlp-door-item"><span class="tlp-door-label">Rear Door</span><span
+                                class="tlp-door-badge na" id="door-rear">—</span></div>
+                        <div class="tlp-door-item"><span class="tlp-door-label">Side Door</span><span
+                                class="tlp-door-badge na" id="door-side">—</span></div>
+                    </div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Validation</div>
+                    <div id="tlp-validation-list" class="tlp-validation-list">
+                        <div class="tlp-val-item neutral"><span class="icon">&#9679;</span> Inside container</div>
+                        <div class="tlp-val-item neutral"><span class="icon">&#9679;</span> No collision</div>
+                        <div class="tlp-val-item neutral"><span class="icon">&#9679;</span> Weight OK</div>
+                        <div class="tlp-val-item neutral"><span class="icon">&#9679;</span> Volume OK</div>
+                        <div class="tlp-val-item neutral"><span class="icon">&#9679;</span> Doors accessible</div>
+                    </div>
+                </div>
+
+                <div class="tlp-stat-card">
+                    <div class="tlp-stat-label">Placement Order</div>
+                    <div id="tlp-sequence-list" class="tlp-sequence-list">
+                        <div class="tlp-empty-hint">No packages placed</div>
+                    </div>
+                </div>
+
+                <!-- Inspector Panel -->
+                <div class="tlp-stat-card" id="inspector-panel" style="display:none;">
+                    <div class="tlp-stat-label" style="display:flex;justify-content:space-between;align-items:center;">
+                        <span>Selected Package</span>
+                        <button class="btn-close" onclick="app._deselectPackage();"
+                            style="width:20px;height:20px;font-size:12px;">&times;</button>
+                    </div>
+                    <div id="inspector-content">
+                        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:6px;"
+                            id="inspector-name">—</div>
+                        <div class="field-group" style="margin-bottom:4px;">
+                            <label class="field-label" style="font-size:9px;">Position (mm)</label>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+                                <div><label style="font-size:9px;color:var(--text-muted);">X</label><input type="number"
+                                        id="inspector-x" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                        onchange="app.updateSelectedPosition()"></div>
+                                <div><label style="font-size:9px;color:var(--text-muted);">Y</label><input type="number"
+                                        id="inspector-y" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                        onchange="app.updateSelectedPosition()"></div>
+                                <div><label style="font-size:9px;color:var(--text-muted);">Z</label><input type="number"
+                                        id="inspector-z" class="field-input" style="font-size:11px;padding:3px 6px;"
+                                        onchange="app.updateSelectedPosition()"></div>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px;">
+                            <div class="field-group">
+                                <label class="field-label" style="font-size:9px;">Rotation</label>
+                                <select id="inspector-rotation" class="field-input"
+                                    style="font-size:11px;padding:3px 6px;" onchange="app.updateSelectedRotation()">
+                                    <option value="0">0&deg;</option>
+                                    <option value="90">90&deg;</option>
+                                    <option value="180">180&deg;</option>
+                                    <option value="270">270&deg;</option>
+                                </select>
+                            </div>
+                            <div class="field-group">
+                                <label class="field-label" style="font-size:9px;">Weight</label>
+                                <div style="font-size:12px;color:var(--text-secondary);padding:3px 0;"
+                                    id="inspector-weight">—</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:4px;">
+                            <button class="btn-section" onclick="app.duplicateSelected()"
+                                style="flex:1;font-size:10px;height:24px;">Duplicate</button>
+                            <button class="btn-section" onclick="app.deleteSelected()"
+                                style="flex:1;font-size:10px;height:24px;color:var(--danger);">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════ STATUS BAR ═══════════ -->
+        <div class="tlp-status-bar">
+            <span>Cursor: <strong id="sb-cursor">—</strong></span>
+            <span>Zoom: <strong id="sb-zoom">100%</strong></span>
+            <span>Grid: <strong id="sb-grid">25 mm</strong></span>
+            <span>Scale: <strong id="sb-scale">—</strong></span>
+            <span>Validation: <strong id="sb-validation" style="color:var(--success);">Ready</strong></span>
+        </div>
+    </div>
+
+    <!-- ═══════════ MODALS ═══════════ -->
+
+    <!-- Save Modal -->
+    <div class="modal-overlay" id="save-modal" onclick="if(event.target===this)app.closeModal('save-modal')">
+        <div class="modal-box">
+            <div class="modal-top">
+                <div class="modal-title" id="save-modal-title">Save Plan</div>
+                <button class="btn-close" onclick="app.closeModal('save-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="field-group">
+                    <label class="field-label">Plan Name</label>
+                    <input id="field-plan-name" class="field-input" placeholder="e.g. Trip to Hanoi #1">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Planner</label>
+                    <input id="field-planner" class="field-input" placeholder="Your name">
+                </div>
+                <div class="field-group">
+                    <label class="field-label">Notes</label>
+                    <input id="field-notes" class="field-input" placeholder="Optional notes">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="app.closeModal('save-modal')">Cancel</button>
+                <button class="btn-save" id="btn-save-confirm" onclick="app.confirmSave()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vehicle Selector Modal -->
+    <div class="modal-overlay" id="vehicle-modal" onclick="if(event.target===this)app.closeModal('vehicle-modal')">
+        <div class="modal-box">
+            <div class="modal-top">
+                <div class="modal-title">Select Vehicle</div>
+                <button class="btn-close" onclick="app.closeModal('vehicle-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-select-list" id="vehicle-select-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipment Selector Modal -->
+    <div class="modal-overlay" id="shipment-modal" onclick="if(event.target===this)app.closeModal('shipment-modal')">
+        <div class="modal-box">
+            <div class="modal-top">
+                <div class="modal-title">Select Shipment</div>
+                <button class="btn-close" onclick="app.closeModal('shipment-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-select-list" id="shipment-select-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Plan Modal -->
+    <div class="modal-overlay" id="load-modal" onclick="if(event.target===this)app.closeModal('load-modal')">
+        <div class="modal-box">
+            <div class="modal-top">
+                <div class="modal-title">Load Plan</div>
+                <button class="btn-close" onclick="app.closeModal('load-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-select-list" id="plan-select-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arranging Progress Modal -->
+    <div class="modal-overlay" id="arrange-progress-modal" onclick="if(event.target===this){}">
+        <div class="modal-box" style="max-width:400px;text-align:center;">
+            <div class="modal-body" style="padding:32px 24px;gap:20px;">
+                <div class="loader" style="margin:0 auto;"></div>
+                <div style="font-size:1rem;font-weight:600;color:var(--text-primary);">Arranging packages...</div>
+                <div style="font-size:0.85rem;color:var(--text-secondary);" id="arrange-progress-mode">Optimizing
+                    placement</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);font-variant-numeric:tabular-nums;"
+                    id="arrange-progress-time">Elapsed: 0s</div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .loader {
+            width: 90px;
+            height: 14px;
+            box-shadow: 0 3px 0 #fff;
+            position: relative;
+            clip-path: inset(-40px 0 -5px)
+        }
+
+        .loader:before {
+            content: "";
+            position: absolute;
+            inset: auto calc(50% - 17px) 0;
+            height: 50px;
+            --g: no-repeat linear-gradient(#ccc 0 0);
+            background: var(--g), var(--g), var(--g), var(--g);
+            background-size: 16px 14px;
+            animation:
+                l7-1 2s infinite linear,
+                l7-2 2s infinite linear;
+        }
+
+        @keyframes l7-1 {
+
+            0%,
+            100% {
+                background-position: 0 -50px, 100% -50px
+            }
+
+            17.5% {
+                background-position: 0 100%, 100% -50px, 0 -50px, 100% -50px
+            }
+
+            35% {
+                background-position: 0 100%, 100% 100%, 0 -50px, 100% -50px
+            }
+
+            52.5% {
+                background-position: 0 100%, 100% 100%, 0 calc(100% - 16px), 100% -50px
+            }
+
+            70%,
+            98% {
+                background-position: 0 100%, 100% 100%, 0 calc(100% - 16px), 100% calc(100% - 16px)
+            }
+        }
+
+        @keyframes l7-2 {
+
+            0%,
+            70% {
+                transform: translate(0)
+            }
+
+            100% {
+                transform: translate(200%)
+            }
+        }
+    </style>
+
+    <div id="toast-container"></div>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/truck-load-planner.js"></script>
+</body>
+
+</html>

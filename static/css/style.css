@@ -1,0 +1,1294 @@
+/* ============================================================
+   Fleet Management — Shared Design System
+   Dark theme, consistent across all pages
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── Design Tokens ──────────────────────────────────────────── */
+:root {
+    --bg:            #0d1117;
+    --surface:       #111827;
+    --surface-2:     #161b22;
+    --surface-3:     #1c2333;
+    --border:        rgba(255, 255, 255, 0.07);
+    --border-hover:  rgba(255, 255, 255, 0.14);
+    --text-primary:  #f0f4f8;
+    --text-secondary:#b0bec9;
+    --text-muted:    #7c8fa3;
+    --accent:        #2f8ceb;
+    --accent-hover:  #2677c9;
+    --accent-glow:   rgba(47, 140, 235, 0.25);
+    --success:       #10b981;
+    --warning:       #f59e0b;
+    --danger:        #ef4444;
+    --header-h:      60px;
+    --sidebar-w:     300px;
+    --radius-sm:     6px;
+    --radius:        8px;
+    --radius-lg:     12px;
+    --radius-xl:     16px;
+    --shadow-sm:     0 1px 3px rgba(0,0,0,0.4);
+    --shadow:        0 4px 16px rgba(0,0,0,0.4);
+    --shadow-lg:     0 12px 40px rgba(0,0,0,0.5);
+    --transition:    0.18s ease;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ── Utility ────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ============================================================
+   SHARED HEADER  (used by ALL pages)
+   ============================================================ */
+.top-header {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    min-height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    gap: 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.35);
+    flex-shrink: 0;
+}
+
+/* Left side — logo / page title */
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.header-left h1 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+}
+
+/* Right side — nav links */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .header-nav { gap: 4px; }
+    .header-nav .btn-nav,
+    .header-nav .nav-dropdown > .btn-nav { padding: 0 10px; font-size: 12px; height: 30px; }
+}
+
+@media (max-width: 768px) {
+    .header-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; flex: 1; }
+    .header-nav::-webkit-scrollbar { display: none; }
+}
+
+/* Center — filter controls (index page only) */
+.header-center {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* ── Navigation Buttons (shared .btn-nav) ───────────────────── */
+.btn-nav,
+.btn-header,
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    background: rgba(255,255,255,0.07);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.btn-nav:hover,
+.btn-header:hover,
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.13);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+}
+
+.btn-nav.active,
+.btn-header.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+/* ── Primary / Danger buttons ───────────────────────────────── */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 18px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--transition), transform var(--transition);
+}
+
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    background: rgba(239,68,68,0.12);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+/* ── Sidebar toggle (index only) ───────────────────────────── */
+.toggle-sidebar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-secondary);
+    font-size: 15px;
+    cursor: pointer;
+    transition: background var(--transition);
+}
+
+.toggle-sidebar-btn:hover {
+    background: rgba(255,255,255,0.13);
+    color: var(--text-primary);
+}
+
+/* ============================================================
+   INDEX PAGE — Map layout
+   ============================================================ */
+.app-shell {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    height: 100vh;
+    overflow: hidden;
+    transition: grid-template-columns 0.28s ease;
+}
+
+.app-shell.sidebar-collapsed {
+    grid-template-columns: 0 1fr;
+}
+
+/* Header spans full width */
+.app-shell > .top-header {
+    grid-column: 1 / -1;
+}
+
+/* ── Index header layout ────────────────────────────────────── */
+.header-filters {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 120px;
+    max-width: 200px;
+    flex: 1;
+}
+
+.control-group.control-group-location {
+    max-width: 280px;
+    flex: 1.4;
+}
+
+.control-group label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary);
+}
+
+.control-group input,
+.control-group select {
+    height: 30px;
+    padding: 0 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-family: inherit;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.control-group input::placeholder { color: var(--text-secondary); }
+
+.control-group input:focus,
+.control-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+    flex: 0 0 auto;
+    min-width: auto;
+    max-width: none;
+    padding-top: 12px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────── */
+.side-panel {
+    grid-row: 2;
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: opacity 0.28s ease;
+}
+
+.app-shell.sidebar-collapsed .side-panel {
+    opacity: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.panel-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+}
+
+.panel-card h2 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+/* ── Map ────────────────────────────────────────────────────── */
+#map-container {
+    grid-row: 2;
+    grid-column: 2;
+    position: relative;
+    overflow: hidden;
+}
+
+#map { width: 100%; height: 100%; }
+
+/* ── Vehicle list in sidebar ─────────────────────────────────── */
+.vehicle-type-options,
+.vehicle-status-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.vehicle-type-option,
+.vehicle-status-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    user-select: none;
+    transition: background var(--transition);
+}
+
+.vehicle-type-option:hover,
+.vehicle-status-option:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.vehicle-type-option input[type="checkbox"],
+.vehicle-status-option input[type="checkbox"] {
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+.vehicle-type-option span,
+.vehicle-status-option span {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.vehicle-list-container {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.vehicle-list-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vehicle-list-items li {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    transition: background var(--transition), color var(--transition);
+}
+
+.vehicle-list-items li:hover {
+    background: rgba(255,255,255,0.09);
+    color: var(--text-primary);
+}
+
+/* ── Source status ──────────────────────────────────────────── */
+.source-status-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.source-status-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.source-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.source-indicator.online  { background: var(--success); }
+.source-indicator.offline { background: var(--danger); }
+
+/* ── Autocomplete ───────────────────────────────────────────── */
+.autocomplete-wrapper { position: relative; overflow: visible; }
+
+/* Position/z-index are set dynamically via JS (portalled to body) */
+.autocomplete-list {
+    background: var(--surface-2);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius);
+    max-height: 320px;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    transition: background var(--transition), color var(--transition);
+    user-select: none;
+}
+
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover,
+.autocomplete-item:active { background: rgba(47,140,235,0.15); color: var(--text-primary); }
+
+.autocomplete-type {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Vehicle icon (map marker) ──────────────────────────────── */
+.vehicle-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ============================================================
+   SHARED MODAL
+   ============================================================ */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+    background: var(--surface-2);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color var(--transition);
+}
+
+.modal-close:hover { color: var(--text-primary); }
+
+.modal-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 10px;
+    padding: 16px 22px;
+    border-top: 1px solid var(--border);
+    justify-content: flex-end;
+}
+
+.modal-footer .btn-primary,
+.modal-footer .btn-secondary {
+    flex: 1;
+}
+
+/* ── Shared form groups ─────────────────────────────────────── */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.form-group:last-child { margin-bottom: 0; }
+
+.form-group label {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-family: inherit;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+select option {
+    background-color: var(--surface-2);
+    color: var(--text-primary);
+}
+
+.form-group input::placeholder { color: var(--text-secondary); }
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+#location-coords {
+    color: var(--text-primary);
+    font-size: 12.5px;
+    margin-bottom: 14px;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--accent);
+}
+
+.hint {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+    margin-top: 4px;
+}
+
+/* ============================================================
+   SHARED TABLE  (locations / trip-history / manage-trips)
+   ============================================================ */
+.shared-table-section {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+}
+
+.shared-table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.shared-table-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.shared-table-wrapper {
+    overflow-x: auto;
+}
+
+.shared-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.shared-table thead tr {
+    background: rgba(255,255,255,0.03);
+}
+
+.shared-table th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+
+.shared-table td {
+    padding: 13px 16px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+}
+
+.shared-table tbody tr:last-child td { border-bottom: none; }
+
+.shared-table tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+/* ── Status badges ──────────────────────────────────────────── */
+.status-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.status-badge.active    { background: rgba(16,185,129,0.15);  color: #34d399; }
+.status-badge.queued    { background: rgba(245,158,11,0.15);  color: #fbbf24; }
+.status-badge.completed { background: rgba(47,140,235,0.15);  color: #60a5fa; }
+.status-badge.canceled  { background: rgba(239,68,68,0.15);   color: #f87171; }
+
+/* ── Table search input ─────────────────────────────────────── */
+.table-search-input {
+    height: 32px;
+    padding: 0 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 12.5px;
+    font-family: inherit;
+    width: 200px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.table-search-input::placeholder { color: var(--text-secondary); }
+.table-search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+.empty-state {
+    text-align: center;
+    padding: 56px 32px;
+    color: var(--text-secondary);
+}
+
+.empty-state p {
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* ============================================================
+   LOCATIONS PAGE — two-column layout
+   ============================================================ */
+.page-shell {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.page-shell .top-header { flex-shrink: 0; }
+
+.page-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Left list panel */
+.list-panel {
+    width: 380px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.list-panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.list-panel-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.list-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Location cards */
+.location-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    transition: border-color var(--transition), background var(--transition);
+}
+
+.location-card:hover { border-color: var(--border-hover); }
+
+.location-card-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    overflow-wrap: anywhere;
+}
+
+.location-card-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.location-card-actions {
+    display: flex;
+    gap: 6px;
+}
+
+/* Map panel */
+.map-panel {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.map-panel #map { width: 100%; height: 100%; }
+
+/* ============================================================
+   MANAGE-TRIPS / TRIP-HISTORY — scrollable content pages
+   ============================================================ */
+.content-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content-main {
+    flex: 1;
+    padding: 28px 32px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+}
+
+/* Cards in manage-trips */
+.content-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+}
+
+.content-card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+}
+
+/* Map inside manage-trips card */
+.card-map {
+    width: 100%;
+    height: 360px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+/* Form grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* Vehicle suggestion items */
+.suggestions-container {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.suggestions-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.suggestions-list { max-height: 360px; overflow-y: auto; }
+
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color var(--transition), background var(--transition);
+    background: var(--surface-3);
+}
+
+.suggestion-item:hover {
+    border-color: var(--accent);
+    background: rgba(47,140,235,0.06);
+}
+
+.suggestion-item.active {
+    border-color: var(--accent);
+    background: rgba(47,140,235,0.1);
+}
+
+.suggestion-info { display: flex; flex-direction: column; gap: 3px; }
+
+.suggestion-name {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.suggestion-details {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* ── Pin button (inside manage-trips form) ──────────────────── */
+.btn-pin {
+    display: inline-flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--transition);
+}
+
+.btn-pin:hover { background: var(--accent-hover); }
+
+/* ── Manage-trips specific inputs ─────────────────────────────*/
+#vehicle-search,
+#active-trips-search {
+    width: 100%;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    font-family: inherit;
+    margin-bottom: 14px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+#vehicle-search::placeholder,
+#active-trips-search::placeholder { color: var(--text-muted); }
+
+#vehicle-search:focus,
+#active-trips-search:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Pickup / Dropoff suggestion dropdowns */
+#pickup-suggestions,
+#dropoff-suggestions {
+    background: var(--surface-2);
+    border: 1px solid var(--border-hover);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.loading-screen.hidden { opacity: 0; visibility: hidden; }
+
+.loading-content { text-align: center; }
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255,255,255,0.08);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.85s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-content h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.loading-progress {
+    width: 260px;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin: 0 auto 12px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}
+
+.loading-text { font-size: 12.5px; color: var(--text-muted); }
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    animation: toastIn 0.25s ease;
+    max-width: 360px;
+}
+
+@keyframes toastIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);   opacity: 1; }
+}
+
+.toast.success { background: var(--success); }
+.toast.error   { background: var(--danger); }
+.toast.warning { background: var(--warning); }
+
+/* Inline action inside a toast (currently Undo after an advance/skip/cancel).
+   Sized past the 44px touch target on its long axis and given a wide hit area,
+   because it is aimed at on a phone, in a vehicle, by someone who has just
+   mis-tapped a button. */
+.toast-action {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 6px 14px;
+    min-height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+}
+.toast-action:hover,
+.toast-action:focus {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Fetch Progress Modal ── */
+.fetch-progress-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+.fetch-progress-overlay.active {
+    display: flex;
+}
+.fetch-progress-modal {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 32px 36px;
+    min-width: 340px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+}
+.fetch-progress-icon {
+    color: var(--accent);
+    margin-bottom: 12px;
+    animation: fetchPulse 1.2s ease-in-out infinite;
+}
+@keyframes fetchPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%      { opacity: 1;   transform: scale(1.1); }
+}
+.fetch-progress-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+.fetch-progress-status {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+.fetch-progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.fetch-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #60a5fa);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+}
+.fetch-progress-count {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.fetch-progress-eta {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    opacity: 0.75;
+    margin-top: 2px;
+}
+
+/* ============================================================
+   GLOBAL RESPONSIVE
+   ============================================================ */
+@media (max-width: 1100px) {
+    .top-header { padding: 0 16px; gap: 12px; }
+    .header-left h1 { font-size: 0.95rem; }
+    .content-main { max-width: 100%; padding: 24px 20px; }
+}
+
+@media (max-width: 900px) {
+    .top-header { padding: 0 12px; gap: 8px; }
+    .header-left { gap: 10px; }
+    .header-left h1 { font-size: 0.85rem; }
+    .content-main { padding: 20px 16px; gap: 16px; }
+    .content-card { padding: 18px; }
+    .list-panel { width: 320px; }
+    .page-shell { font-size: 13px; }
+}
+
+@media (max-width: 768px) {
+    .top-header { flex-wrap: wrap; padding: 6px 10px; gap: 6px; row-gap: 6px; }
+    .header-left { min-width: 0; }
+    .header-left h1 { overflow: hidden; text-overflow: ellipsis; max-width: 50vw; }
+    .page-main { flex-direction: column; }
+    .list-panel { width: 100%; max-height: 250px; border-right: none; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .map-panel { flex: 1; min-height: 300px; }
+    .content-main { padding: 14px 12px; gap: 12px; }
+    .content-card { padding: 14px; }
+    .content-card h2 { font-size: 1rem; }
+    .shared-table-wrapper { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+    .top-header { padding: 4px 8px; }
+    .header-left h1 { font-size: 0.75rem; max-width: 35vw; }
+    .content-main { padding: 10px 8px; gap: 10px; }
+    .content-card { padding: 12px; }
+}
+
+/* ── Index page responsive ────────────────────────────────── */
+@media (max-width: 1100px) {
+    .app-shell { grid-template-columns: 280px 1fr; }
+    .header-filters { gap: 8px; }
+    .control-group { min-width: 100px; }
+}
+
+@media (max-width: 900px) {
+    .app-shell { grid-template-columns: 240px 1fr; }
+    .header-filters { gap: 6px; }
+    .control-group { min-width: 80px; }
+}
+
+@media (max-width: 768px) {
+    .app-shell { grid-template-columns: 200px 1fr; }
+    .header-filters { width: 100%; order: 10; flex-wrap: wrap; }
+    .header-filters .control-group { flex: 1; min-width: 120px; }
+    .header-filters .checkbox-group { flex: 0 0 auto; }
+    .side-panel { font-size: 12px; }
+}
+
+@media (max-width: 600px) {
+    .app-shell.sidebar-collapsed { grid-template-columns: 0 1fr; }
+    .app-shell:not(.sidebar-collapsed) { grid-template-columns: 200px 1fr; }
+}
+
+@media (max-width: 480px) {
+    .header-filters .control-group { min-width: 100px; }
+    .header-filters .control-group-location { width: 100%; }
+}

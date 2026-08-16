@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: fleetfuel
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn wsgi:app"
+
+    # Without this everything written at runtime lives on the container's
+    # ephemeral filesystem and is destroyed on every deploy and restart.
+    # That took out two things:
+    #   - routing_system.db. `*.db` is gitignored, so it was never shipped in
+    #     the repo either — init_db() simply recreated it empty on each boot.
+    #   - DeliveryPlans/, the proof-of-delivery photos. A requirement that
+    #     completing a stop needs a photo is worse than useless if the photo
+    #     is gone next deploy: it looks like it is protecting you.
+    #
+    # Note for whoever changes this next: a service with a disk cannot run
+    # more than one instance and loses zero-downtime deploys. Neither costs
+    # anything here — production is already a single synchronous Gunicorn
+    # worker (see CLAUDE.md).
+    disk:
+      name: fleetfuel-data
+      mountPath: /var/data
+      # Sized with room to think, not to last forever. Phone photos run
+      # 2-4 MB and the gate now requires two per stop, so a 40-vehicle day
+      # is roughly 0.5-1 GB. Weeks, not years — the end-of-day export is how
+      # photos are meant to leave, and old days should be pruned once they
+      # have been downloaded.
+      sizeGB: 20
+
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.12
+      # Absolute, which pathlib makes replace config.py's BASE_DIR join
+      # rather than append to it.
+      - key: DB_PATH
+        value: /var/data/routing_system.db
+      # Parent of DeliveryPlans/. Kept as a directory rather than pointing
+      # straight at the upload folder so `relative_path` values already in
+      # the database ("DeliveryPlans/2026/...") stay correct.
+      - key: DATA_DIR
+        value: /var/data

@@ -1,0 +1,189 @@
+/* ── End of Day page ──────────────────────────────────────────
+   Five numbered steps in the order the operator already works: pick the
+   day, check what the drivers sent, hand over the two kinds of photo the
+   stops never carried, name the folder, download. */
+
+.export-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.export-card {
+    background: var(--surface, #161b22);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+}
+
+.export-card h2 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.export-sub {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.export-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.export-row label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.export-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0 0 10px;
+}
+
+.export-row .export-hint {
+    margin: 0;
+}
+
+.export-folder-input {
+    flex: 1;
+    min-width: 260px;
+}
+
+/* Label wrapping a hidden file input, so the whole control is the target. */
+.export-upload-btn {
+    cursor: pointer;
+}
+
+/* ── Proof summary ── */
+.export-driver {
+    margin-bottom: 12px;
+}
+
+.export-driver-name {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.export-stop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    padding: 3px 0 3px 10px;
+    /* The bar carries the state, so a row is readable at a glance without
+       reading the words — this list is scanned, not studied. */
+    border-left: 3px solid transparent;
+}
+
+.export-stop.is-ok {
+    border-left-color: var(--success);
+}
+
+.export-stop.is-missing {
+    border-left-color: var(--danger);
+}
+
+.export-station {
+    min-width: 90px;
+    font-variant-numeric: tabular-nums;
+}
+
+.export-state {
+    color: var(--text-secondary);
+}
+
+/* A waived completion is not an error — it is a decision someone made and
+   explained. Styled as a note rather than an alarm. */
+.export-override {
+    color: var(--warning);
+    font-style: italic;
+}
+
+/* ── Uploaded day photos ── */
+.export-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+/* Loading is the one list that grows without bound — a day's pallet shots run
+   to dozens, and the section pushed the download button off the screen. Capped
+   and scrolled rather than collapsed: the operator is checking what is already
+   uploaded, so the list has to stay readable, just not endless.
+
+   Only #loadingList carries this. HinhThungTrong is one photo per driver and
+   would gain a scrollbar it never fills. */
+.export-thumbs--scroll {
+    max-height: 220px;
+    overflow-y: auto;
+    /* Room for the scrollbar so it never sits on top of a remove button. */
+    padding: 6px 10px 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* An empty list is a one-line hint; a bordered, 220px-tall empty box around it
+   reads as something broken. The frame only appears once there is content. */
+.export-thumbs--scroll:not(:has(.export-thumb)) {
+    max-height: none;
+    padding: 0;
+    border: 0;
+    background: none;
+}
+
+.export-thumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 6px 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    max-width: 100%;
+}
+
+.export-thumb-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 220px;
+}
+
+.export-thumb-remove {
+    height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* ── Structure preview ── */
+.export-tree {
+    margin: 10px 0 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    overflow-x: auto;
+    white-space: pre;
+}
+
+@media (max-width: 640px) {
+    .export-folder-input { min-width: 0; width: 100%; }
+    .export-thumb-name { max-width: 150px; }
+}

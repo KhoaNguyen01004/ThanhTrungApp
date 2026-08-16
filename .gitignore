@@ -1,0 +1,76 @@
+# Environment variables (contains secrets!)
+.env
+credentials.json
+
+# Database files
+*.db
+
+#images
+DeliveryPlans/
+
+# Runtime data / logs
+log.json
+instrument_trace.jsonl
+*.log
+browserlogs.txt
+manual_locations.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node — jsdom is a dev-only dependency of tests/js/, not vendored
+node_modules/
+
+# Generated benchmark/diagnostic output. tests/test_all.py writes
+# reports/{cmd}_{mode}_{timestamp}.txt on every run and creates the directory
+# itself, so the files are disposable and the folder need not be tracked.
+reports/
+
+# graphify's own generated artifacts. graph.json / graph.html / GRAPH_REPORT.md
+# stay tracked — they are the thing the standing "query the graph first"
+# instruction reads. These two are not:
+#   cache/   AST extraction cache, ~9 MB, rebuilt on demand by `graphify update .`
+#   <date>/  rotating backups of superseded graphs, ~2-3 MB each
+# Together they were ~20 MB of generated files in git history.
+graphify-out/cache/
+graphify-out/20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
+
+# Staging area for files removed 2026-08-06; delete the folder once reviewed.
+_trash_2026-08-06/
+
+# Temporary files
+*.tmp
+*.bak
+

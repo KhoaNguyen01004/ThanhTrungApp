@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Plan Builder</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/delivery-plan-builder.css">
+    <style>
+        .step:not(.step-active) { cursor: default; }
+    </style>
+</head>
+<body{% if edit_plan_id %} data-edit-plan-id="{{ edit_plan_id }}"{% endif %}>
+    <div class="content-shell">
+        <header class="top-header">
+            <div class="header-left">
+                <a href="/" class="btn-nav">Back to Map</a>
+                <h1>{{ "Edit Plan" if edit_plan_id else "Delivery Plan Builder" }}</h1>
+            </div>
+            <nav class="header-nav">
+                <span id="autoSaveIndicator" class="auto-save-indicator"></span>
+                <a href="/" class="btn-nav">Map</a>
+                <a href="/delivery/dashboard" class="btn-nav">Dispatch</a>
+                <a href="/delivery/new" class="btn-nav active">Plan Builder</a>
+                <a href="/locations" class="btn-nav">Locations</a>
+                <a href="/truck-load-planner" class="btn-nav">Load Planner</a>
+                <div class="nav-dropdown" style="position:relative;">
+                    <button class="btn-nav" onclick="var d=this.nextElementSibling;d.style.display=d.style.display==='block'?'none':'block'" style="cursor:pointer;background:none;border:none;font-family:inherit;font-size:13px;color:#c9d1d9;font-weight:500;padding:0 14px;height:34px;display:inline-flex;align-items:center;gap:4px;">Fleet &#9662;</button>
+                    <div style="display:none;position:absolute;top:100%;right:0;background:#161b22;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px;min-width:170px;box-shadow:0 12px 40px rgba(0,0,0,0.5);z-index:200;" class="fleet-dropdown">
+                        <a href="/oil-change" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Oil Change</a>
+                        <a href="/vehicle-management" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Vehicles</a>
+                        <a href="/fuel-efficiency" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Fuel</a>
+                        <a href="/fuel-container" class="btn-nav" style="display:flex;width:100%;border-radius:6px;padding:8px 12px;font-size:13px;white-space:nowrap;">Container</a>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="content-main">
+            <!-- Read-only banner -->
+            <div id="readOnlyBanner" class="read-only-banner" style="display:none;">
+                This plan is <strong>confirmed</strong> and is read-only. Editing is not available.
+            </div>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step step-active" data-step="1">
+                    <span class="step-number">1</span>
+                    <span class="step-label">Plan Info</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="2">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Vehicles</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="3">
+                    <span class="step-number">3</span>
+                    <span class="step-label">Stops</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="4">
+                    <span class="step-number">4</span>
+                    <span class="step-label">Review</span>
+                </div>
+                <div class="step-connector"></div>
+                <div class="step" data-step="5">
+                    <span class="step-number">5</span>
+                    <span class="step-label">Done</span>
+                </div>
+            </div>
+
+            <!-- Step 1: Plan Information -->
+            <div class="content-card step-panel" id="step1Panel">
+                <!-- Google Sheet import. Read-only against the manager's
+                     planning sheet; builds the whole plan in one action and
+                     skips steps 2-4. Shown only when creating a new plan. -->
+                <div class="sheet-import" id="sheetImportBox">
+                    <div class="sheet-import-head">
+                        <div>
+                            <h2 style="margin:0;">Import from Google Sheet</h2>
+                            <p class="sheet-import-sub">Reads the Huwei planning sheet and builds the plan. The sheet is never modified.</p>
+                        </div>
+                        <div class="sheet-import-controls">
+                            <label for="sheetImportDate" class="sheet-import-label">Dispatch date</label>
+                            <input type="date" id="sheetImportDate">
+                            <button class="btn-primary" id="sheetImportBtn">Read sheet</button>
+                        </div>
+                    </div>
+                    <div class="sheet-import-result" id="sheetImportResult" style="display:none;"></div>
+                </div>
+
+                <h2>Plan Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="planName">Plan Name <span class="required">*</span></label>
+                        <input type="text" id="planName" placeholder="e.g. Daily Delivery - July 26">
+                    </div>
+                    <div class="form-group">
+                        <label for="planDate">Plan Date <span class="required">*</span></label>
+                        <input type="date" id="planDate">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="planDescription">Description</label>
+                        <textarea id="planDescription" rows="3" placeholder="Optional notes about this plan"></textarea>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <div></div>
+                    <button class="btn-primary" id="step1Next">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 2: Vehicle Assignments -->
+            <div class="content-card step-panel" id="step2Panel" style="display:none;">
+                <h2>Vehicle Assignments</h2>
+                <p class="step-description">Add one or more vehicles to this delivery plan. Each vehicle will have its own list of stops.</p>
+                <div class="assignments-list" id="assignmentsList"></div>
+                <button class="btn-secondary" id="addAssignmentBtn" style="margin-top:12px;">+ Add Vehicle</button>
+                <div class="step-actions">
+                    <button class="btn-secondary" id="step2Back">Back</button>
+                    <button class="btn-primary" id="step2Next">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Stops -->
+            <div class="content-card step-panel" id="step3Panel" style="display:none;">
+                <h2>Stops</h2>
+                <p class="step-description">For each vehicle, add stops in the order they should be visited. Drag handles to reorder.</p>
+                <div class="assignment-tabs" id="assignmentTabs"></div>
+                <div class="stops-section" id="stopsSection">
+                    <div class="stops-toolbar">
+                        <h3 id="stopsAssignmentTitle">Select a vehicle above to configure stops</h3>
+                        <button class="btn-secondary" id="addStopBtn" style="display:none;">+ Add Stop</button>
+                    </div>
+                    <div class="stops-list" id="stopsList">
+                        <div class="empty-state">Select a vehicle assignment to add stops</div>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <button class="btn-secondary" id="step3Back">Back</button>
+                    <button class="btn-primary" id="step3Next">Next</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Review -->
+            <div class="content-card step-panel" id="step4Panel" style="display:none;">
+                <h2>Review Your Plan</h2>
+                <p class="step-description">Review all information before saving. Items with issues are highlighted.</p>
+
+                <div id="reviewValidation" class="review-validation"></div>
+                <div id="reviewContent"></div>
+
+                <div id="step4ConfirmedInfo" class="confirmed-info" style="display:none;">
+                    <p>This plan has been confirmed and is read-only.</p>
+                </div>
+
+                <div class="step-actions">
+                    <button class="btn-secondary" id="step4Back">Back</button>
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn-secondary" id="step4SaveDraft">Save Draft</button>
+                        <button class="btn-primary" id="step4Confirm">Confirm Plan</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Success -->
+            <div class="content-card step-panel" id="step5Panel" style="display:none;">
+                <div class="success-container">
+                    <div class="success-icon">&#10003;</div>
+                    <h2>Plan Created Successfully</h2>
+                    <div id="successDetails"></div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:20px;">
+                        <a id="openPlanLink" href="#" class="btn-primary" style="display:none;text-decoration:none;">Open Plan</a>
+                        <a id="createAnotherPlanBtn" href="/delivery/new" class="btn-secondary" style="display:none;text-decoration:none;">Create Another Plan</a>
+                        <a id="returnToDashboardBtn" href="/" class="btn-secondary" style="display:none;text-decoration:none;">Return to Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment Modal -->
+            <div class="modal-overlay" id="assignmentModal" style="display:none;">
+                <div class="modal-card">
+                    <h3 id="assignmentModalTitle">Add Vehicle Assignment</h3>
+                    <div class="form-grid">
+                        <div class="form-group autocomplete-wrapper">
+                            <label for="assignVehicle">Vehicle <span class="required">*</span></label>
+                            <input type="text" id="assignVehicle" autocomplete="off" placeholder="Search vehicle by plate...">
+                            <div id="vehicleAutocompleteList" class="autocomplete-list" style="display:none;max-height:220px;overflow-y:auto;"></div>
+                        </div>
+                        <div class="form-group autocomplete-wrapper">
+                            <label for="assignDriver">Driver</label>
+                            <input type="text" id="assignDriver" autocomplete="off" placeholder="Type driver name or select from vehicle">
+                            <div id="driverAutocompleteList" class="autocomplete-list" style="display:none;max-height:200px;overflow-y:auto;"></div>
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="assignNotes">Notes</label>
+                            <textarea id="assignNotes" rows="2" placeholder="Optional notes for this assignment"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" id="assignmentModalCancel">Cancel</button>
+                        <button class="btn-primary" id="assignmentModalSave">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stop Modal -->
+            <div class="modal-overlay" id="stopModal" style="display:none;">
+                <div class="modal-card modal-card-wide">
+                    <h3 id="stopModalTitle">Add Stop</h3>
+
+                    <!-- Station Search -->
+                    <div class="form-group" style="margin-bottom:14px;">
+                        <label for="stopStationSearch">Search Saved Station</label>
+                        <input type="text" id="stopStationSearch" placeholder="Type station name or code to search..." autocomplete="off">
+                        <div id="stopStationSuggestions" class="station-suggestions" style="display:none;"></div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="stopStationCode">Station Code</label>
+                            <input type="text" id="stopStationCode" placeholder="e.g. ST-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopStationName">Station Name <span class="required">*</span></label>
+                            <input type="text" id="stopStationName" placeholder="e.g. ABC Warehouse">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="stopAddress">Address</label>
+                            <input type="text" id="stopAddress" placeholder="Full address">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopLat">Latitude</label>
+                            <div style="display:flex;gap:6px;">
+                                <input type="text" id="stopLat" placeholder="e.g. 10.8231" style="flex:1;">
+                                <button class="btn-secondary" id="pickMapBtn" type="button" title="Pick on map">&#127758;</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="stopLng">Longitude</label>
+                            <input type="text" id="stopLng" placeholder="e.g. 106.6297">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopManager">Manager</label>
+                            <input type="text" id="stopManager" placeholder="Contact person">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopPhone">Phone</label>
+                            <input type="text" id="stopPhone" placeholder="Contact phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="stopProduct">Product</label>
+                            <input type="text" id="stopProduct" placeholder="e.g. Steel pipes">
+                        </div>
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <label for="stopNotes">Notes</label>
+                            <textarea id="stopNotes" rows="2" placeholder="Optional notes about this stop"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-secondary" id="stopModalCancel">Cancel</button>
+                        <button class="btn-primary" id="stopModalSave">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Picker Overlay -->
+            <div class="modal-overlay" id="mapPickerOverlay" style="display:none;">
+                <div class="modal-card modal-card-map">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <h3>Pick Location on Map</h3>
+                        <button class="btn-secondary" id="mapPickerClose">Done</button>
+                    </div>
+                    <div id="mapPickerMap" style="height:400px;border-radius:8px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/delivery-plan-builder.js"></script>
+    <script>document.addEventListener('click',e=>{if(!e.target.closest('.nav-dropdown'))document.querySelectorAll('.fleet-dropdown').forEach(d=>d.style.display='none')});</script>
+</body>
+</html>
