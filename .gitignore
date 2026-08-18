@@ -3,7 +3,7 @@
 credentials.json
 
 # Database files
-*.db
+
 
 #images
 DeliveryPlans/
